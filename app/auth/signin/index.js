@@ -1,50 +1,287 @@
+import React, { useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { useNavigation } from 'expo-router';
+import { useForm, Controller } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'expo-router';
-import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { Video } from 'expo-av'; // Importing Video component from expo-av
 
-const { width, height } = Dimensions.get('window');
+// Validation schema using Yup
+const schema = yup.object().shape({
+  name: yup.string().required('Customer name is required'),
+  mobile: yup
+    .string()
+    .min(10, 'Mobile number must be at least 10 digits')
+    .required('Mobile number is required'),
+  address: yup.string().required('Address is required'),
+  email: yup
+    .string()
+    .email('Invalid email format')
+    .required('Email is required'),
+  pincode: yup
+    .string()
+    .matches(/^[0-9]{6}$/, 'PIN Code must be 6 digits')
+    .required('PIN Code is required'),
+  location: yup.string().required('Location is required'),
+  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
+  lastName: yup.string().required('Last Name is required'),
+});
 
-export default function Welcome() {
-  const [currentSlogan, setCurrentSlogan] = useState('');
+export default function SignUp() {
+  const navigation = useNavigation();
   const router = useRouter();
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
   useEffect(() => {
-    const slogans = [
-      "நீர் உயிர்க்காக அவசியம். அதை விரயம் செய்யாமல், தகுந்த விதத்தில் பயன்படுத்துவோம்.",
-      "ஒவ்வொரு துளியும் முக்கியம், எதிர்காலத்தைப் பாதுகாக்க நீரை சிக்கனமாக பயன்படுத்துங்கள்!",
-      "நீர் தகுந்த முறையில் பயன்படுத்துங்கள், நம் உலகத்தை பாதுகாப்போம்.",
-      "நீர் வளங்களை பெருக்க, ஒவ்வொருவரும் சிந்தித்து செயல் படுவோம்!",
-      "நீர் சேமிப்பு என்பது வாழ்க்கையின் முக்கிய பங்கு."
-    ];
-    setCurrentSlogan(slogans[Math.floor(Math.random() * slogans.length)]);
-
-    const interval = setInterval(() => {
-      setCurrentSlogan(slogans[Math.floor(Math.random() * slogans.length)]);
-    }, 5000);
-
-    return () => clearInterval(interval);
+    navigation.setOptions({
+      headerShown: false,
+    });
   }, []);
+
+  const onSubmit = async (data) => {
+    const payload = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      lastName: data.lastName,
+      location: data.location,
+      phoneno: `+91${data.mobile}`,
+    };
+
+    try {
+      console.log('Sending Payload:', payload);
+      const response = await fetch('https://promptly-touched-toucan.ngrok-free.app/api/v1/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(errorData.message || 'Something went wrong!');
+      }
+
+      const responseData = await response.json();
+      console.log('API Response:', responseData);
+      navigation.navigate('SignIn');
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Something went wrong');
+      console.error('Fetch Error:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/water1.png')} style={styles.backgroundImage} />
-      <View style={styles.overlay} />
-      <View style={styles.textContainer}>
-        <Text style={styles.text}>{currentSlogan}</Text>
-      </View>
-      <TouchableOpacity style={styles.button} onPress={() => router.push('/auth/signup')}>
-        <Text style={styles.buttonText}>Get Started</Text>
-      </TouchableOpacity>
+      {/* Video Background */}
+       <Video
+              source={require('../../../assets/videos/1.mp4')}
+              rate={1.0}
+              volume={1.0}
+              isMuted={false}
+              resizeMode="cover"
+              shouldPlay
+              isLooping
+              style={StyleSheet.absoluteFillObject}  // Fullscreen video
+            />
+      
+      {/* Form and Input Fields */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={styles.formContainer}>
+            <Text style={styles.title}>Register</Text>
+
+            {/* Customer Name Input */}
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Customer Name"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  {errors.name && <Text style={styles.error}>{errors.name.message}</Text>}
+                </View>
+              )}
+            />
+
+            {/* Last Name Input */}
+            <Controller
+              control={control}
+              name="lastName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Last Name"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  {errors.lastName && <Text style={styles.error}>{errors.lastName.message}</Text>}
+                </View>
+              )}
+            />
+
+            {/* Mobile Number Input */}
+            <Controller
+              control={control}
+              name="mobile"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Mobile Number"
+                    keyboardType="numeric"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  {errors.mobile && <Text style={styles.error}>{errors.mobile.message}</Text>}
+                </View>
+              )}
+            />
+
+            {/* Email Input */}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
+                </View>
+              )}
+            />
+
+            {/* Password Input */}
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    secureTextEntry
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
+                </View>
+              )}
+            />
+
+            {/* Location Input */}
+            <Controller
+              control={control}
+              name="location"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Location"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  {errors.location && <Text style={styles.error}>{errors.location.message}</Text>}
+                </View>
+              )}
+            />
+
+            {/* Submit Button */}
+            <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
+              <Text style={styles.buttonText}>Sign Up</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => router.push('/auth/signup')}>
+              <Text style={styles.link}>Already have an account? Login</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  backgroundImage: { position: 'absolute', width: '100%', height: '65%', resizeMode: 'cover' },
-  overlay: { position: 'absolute', width, height, backgroundColor: 'rgba(197, 193, 193, 0.3)' },
-  textContainer: { marginBottom: 90, zIndex: 1 },
-  text: { fontSize: 18, textAlign: 'center', color: '#0e0c0c', marginTop: 480 },
-  button: { backgroundColor: '#051939', padding: 12, borderRadius: 90, width: width - 150, position: 'absolute', bottom: 30, alignItems: 'center' },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backgroundVideo: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  formContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+    borderRadius: 10,
+    width: '90%',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 15,
+  },
+  input: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingLeft: 10,
+    backgroundColor: '#fff',
+  },
+  error: {
+    color: 'red',
+    fontSize: 12,
+  },
+  button: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  link: {
+    textAlign: 'center',
+    marginTop: 10,
+    color: '#007BFF',
+  },
 });
