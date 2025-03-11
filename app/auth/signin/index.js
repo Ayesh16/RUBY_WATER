@@ -84,15 +84,16 @@ export default function SignUp() {
   return (
     <View style={styles.container}>
       {/* Video Background */}
-      <Video
-        source={require('../../../assets/videos/1.mp4')}
-        rate={1.0}
-        volume={1.0}
-        isMuted={false}
-        shouldPlay
-        isLooping
-        style={styles.backgroundVideo}
-      />
+       <Video
+              source={require('../../../assets/videos/1.mp4')}
+              rate={1.0}
+              volume={1.0}
+              isMuted={false}
+              resizeMode="cover"
+              shouldPlay
+              isLooping
+              style={StyleSheet.absoluteFillObject}  // Fullscreen video
+            />
       
       {/* Form and Input Fields */}
       <KeyboardAvoidingView
