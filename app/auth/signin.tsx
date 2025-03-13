@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   signupLink: {
-    color: '#fff',  // Keep signup link white
+    color: 'black',  // Keep signup link white
     textDecorationLine: 'underline',
     fontSize: 16,
   },

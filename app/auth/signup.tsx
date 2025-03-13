@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 15,
-    height: 40,
+    height: 50,
     width: 300
   },
   input: {
