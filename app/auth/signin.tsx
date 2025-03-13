@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
-import { Video } from 'expo-av';  // Import Video from expo-av
-import { useRouter } from 'expo-router';
-import { useNavigation } from 'expo-router';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  ActivityIndicator, 
+  Image 
+} from 'react-native';
+import { Video, ResizeMode } from 'expo-av';  // Fix ResizeMode type
+import { useRouter, useNavigation } from 'expo-router';
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
   const router = useRouter();
   const navigation = useNavigation();
 
@@ -23,11 +31,12 @@ export default function Login() {
       setErrorMessage('Please fill out both email and password fields.');
       return;
     }
+    
     const payload = { email, password };
 
     try {
       setLoading(true);
-      const response = await fetch(' https://promptly-touched-toucan.ngrok-free.app/api/v1/auth/login', {
+      const response = await fetch('https://promptly-touched-toucan.ngrok-free.app/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -44,7 +53,7 @@ export default function Login() {
         alert('Login successful!');
         router.push('/home');  // Redirect to home page
       }
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage('Login Failed: ' + (error.message || 'Something went wrong'));
     } finally {
       setLoading(false);
@@ -60,11 +69,11 @@ export default function Login() {
     <View style={styles.container}>
       {/* Video Background */}
       <Video
-        source={require('../../../assets/videos/1.mp4')}
+        source={require('../../assets/videos/1.mp4')}
         rate={1.0}
         volume={1.0}
         isMuted={false}
-        resizeMode="cover"
+        resizeMode={ResizeMode.COVER}  // Corrected ResizeMode usage
         shouldPlay
         isLooping
         style={StyleSheet.absoluteFillObject}  // Fullscreen video
@@ -82,7 +91,7 @@ export default function Login() {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            autoCompleteType="email"
+            autoComplete="email"
           />
         </View>
 
@@ -116,7 +125,7 @@ export default function Login() {
         </TouchableOpacity>
 
         <View style={styles.signupLinkContainer}>
-          <Text style={styles.signupLink} onPress={() => router.push('/auth/signin')}>
+          <Text style={styles.signupLink} onPress={() => router.push('/auth/signup')}>
             New User? Register
           </Text>
         </View>
@@ -134,7 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: 'rgba(0, ,1 , 0.7)',  // Increase opacity for a darker effect
+    backgroundColor: 'rgba(0, 0, 1, 0.7)',  // Fixed incorrect RGBA format
   },
   title: {
     fontSize: 32,
@@ -209,3 +218,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export default Login;

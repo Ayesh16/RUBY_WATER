@@ -1,5 +1,5 @@
-import { Text, View } from "react-native";
-import Home from "@/componets/Home";
+import { View } from "react-native";
+import Welcome from "@/componets/Welcome";
 
 export default function Index() {
   return (
@@ -8,7 +8,7 @@ export default function Index() {
         flex: 1,
       }}
     >
-      <Home />
+      <Welcome />
     </View>
   );
 }
