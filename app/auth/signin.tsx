@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: "rgba(0,0,0,0.4)", // Optional overlay for contrast
+    backgroundColor: "rgba(0,0,0,0.2)", // Optional overlay for contrast
   },
   title: {
     fontSize: 32,

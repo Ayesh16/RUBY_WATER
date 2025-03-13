@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Dark overlay for better contrast
+    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Dark overlay for better contrast
     justifyContent: 'center',
     alignItems: 'center',
   },
