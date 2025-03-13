@@ -56,7 +56,7 @@ export default function Login() {
       {/* Get Started Button */}
       <TouchableOpacity 
         style={styles.button}
-        onPress={() => router.push('/auth/signup')}
+        onPress={() => router.push('/auth/signin')}
 
       >
         {/* Ensure Text inside TouchableOpacity is wrapped */}
