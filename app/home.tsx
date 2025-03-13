@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   banner: { alignItems: "center", marginTop: 20 },
   bannerImage: { width: 150, height: 150 },
   welcomeText: { fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 10 },
-  categoryTitle: { fontSize: 18, fontWeight: "600", marginTop: 20 },
+  categoryTitle: { fontSize: 18, fontWeight: "600", marginTop: 20 , textAlign: "center"},
   categoryGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: 15 },
   categoryCard: { backgroundColor: "#f0f0f0", borderRadius: 10, padding: 10, alignItems: "center", width: "48%", marginBottom: 15 },
   categoryImage: { width: 100, height: 100 },
