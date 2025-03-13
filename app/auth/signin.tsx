@@ -67,17 +67,6 @@ const Login: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Video Background */}
-      <Video
-        source={require('../../assets/videos/1.mp4')}
-        rate={1.0}
-        volume={1.0}
-        isMuted={false}
-        resizeMode={ResizeMode.COVER}  // Corrected ResizeMode usage
-        shouldPlay
-        isLooping
-        style={StyleSheet.absoluteFillObject}  // Fullscreen video
-      />
 
       {/* Overlay for form */}
       <View style={styles.overlay}>
@@ -143,18 +132,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: 'rgba(0, 0, 1, 0.7)',  // Fixed incorrect RGBA format
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 30,
-    color: '#fff',  // Keep text white for contrast
+    color: 'black',  // Keep text white for contrast
     textAlign: 'center',
   },
   inputContainer: {
     marginBottom: 15,
-    width: '100%',
+    width: 300,
+    height: 50
+
   },
   input: {
     height: 50,
@@ -179,7 +169,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
-    width: '100%',
+    width: 300,
   },
   buttonText: {
     color: '#fff',
@@ -194,7 +184,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    width: '100%',
+    width: 300,
     maxWidth: 350,
   },
   googleLogo: {
