@@ -26,10 +26,10 @@ interface SignUpFormData {
   location: string;
   password: string;
   role: "user" | "admin"; // ✅ Fixing the type issue
-  truckOwnerName?: string;
-  truckId?: string;
-  truckCapacity?: string;
-  truckType?: string;
+  truck_OwnerName?: string;
+  truck_Id?: string;
+  truck_Capacity?: string;
+  truck_Type?: string;
 }
 
 // Validation Schema
@@ -43,22 +43,22 @@ const schema = yup.object({
   password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
   role: yup.mixed<"user" | "admin">().oneOf(['user', 'admin']).required('Role is required'),
 
-  truckOwnerName: yup.string().when('role', {
+  truck_OwnerName: yup.string().when('role', {
     is: "admin",
     then: (schema) => schema.required('Truck Owner Name is required'),
     otherwise: (schema) => schema.notRequired(),
   }),
-  truckId: yup.string().when('role', {
+  truck_Id: yup.string().when('role', {
     is: "admin",
     then: (schema) => schema.required('Truck ID is required'),
     otherwise: (schema) => schema.notRequired(),
   }),
-  truckCapacity: yup.string().when('role', {
+  truck_Capacity: yup.string().when('role', {
     is: "admin",
     then: (schema) => schema.required('Truck Capacity is required'),
     otherwise: (schema) => schema.notRequired(),
   }),
-  truckType: yup.string().when('role', {
+  truck_Type: yup.string().when('role', {
     is: "admin",
     then: (schema) => schema.required('Truck Type is required'),
     otherwise: (schema) => schema.notRequired(),
@@ -148,7 +148,7 @@ export default function SignUp() {
             {/* Admin Fields */}
             {isAdmin && (
               <>
-                {['truck Owner Name', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
+                {['truck_OwnerName', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
                   <Controller
                     key={field}
                     control={control}
