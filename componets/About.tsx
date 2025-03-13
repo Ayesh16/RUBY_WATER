@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 
-const AboutUsScreen: React.FC = () => {
+const AboutUs: React.FC = () => {
   return (
     <View style={styles.container}>
       <Image source={require("./assets/tanker.png")} style={styles.tankerImage} />
@@ -56,5 +56,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AboutUsScreen;
+export default AboutUs;
 
