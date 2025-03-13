@@ -15,9 +15,7 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'expo-router';
-import { Video, ResizeMode } from 'expo-av';
 
-// Define the form data interface
 interface SignUpFormData {
   name: string;
   lastName: string;
@@ -29,7 +27,6 @@ interface SignUpFormData {
   password: string;
 }
 
-// Validation schema using Yup
 const schema = yup.object().shape({
   name: yup.string().required('Customer name is required'),
   mobile: yup
@@ -65,44 +62,14 @@ export default function SignUp() {
     });
   }, []);
 
-  const onSubmit = async (data: SignUpFormData) => {
-    const payload = {
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      lastName: data.lastName,
-      location: data.location,
-      phoneno: `+91${data.mobile}`,
-    };
-
-    try {
-      console.log('Sending Payload:', payload);
-      const response = await fetch('https://promptly-touched-toucan.ngrok-free.app/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API Error:', errorData);
-        throw new Error(errorData.message || 'Something went wrong!');
-      }
-
-      const responseData = await response.json();
-      console.log('API Response:', responseData);
-      router.push('/auth/signin');
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Something went wrong');
-      console.error('Fetch Error:', error);
-    }
+  const onSubmit = (data: SignUpFormData) => {
+    console.log('Form Data:', data);
+    Alert.alert('Success', 'Account created successfully!');
+    router.push('/auth/signin');
   };
 
   return (
     <View style={styles.container}>
-
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

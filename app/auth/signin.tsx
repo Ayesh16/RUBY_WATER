@@ -8,7 +8,6 @@ import {
   ActivityIndicator, 
   Image 
 } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';  // Fix ResizeMode type
 import { useRouter, useNavigation } from 'expo-router';
 
 const Login: React.FC = () => {
@@ -26,49 +25,26 @@ const Login: React.FC = () => {
     });
   }, []);
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     if (!email || !password) {
       setErrorMessage('Please fill out both email and password fields.');
       return;
     }
     
-    const payload = { email, password };
-
-    try {
-      setLoading(true);
-      const response = await fetch('https://promptly-touched-toucan.ngrok-free.app/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || 'Something went wrong!');
-      }
-
-      const { token } = responseData;
-      if (token) {
-        alert('Login successful!');
-        router.push('/home');  // Redirect to home page
-      }
-    } catch (error: any) {
-      setErrorMessage('Login Failed: ' + (error.message || 'Something went wrong'));
-    } finally {
+    setLoading(true);
+    setTimeout(() => {
       setLoading(false);
-    }
+      alert('Login successful!');
+      router.push('/home');
+    }, 1000);
   };
 
   const handleGoogleLogin = () => {
-    // Implement Google Login logic here
     alert("Google Login clicked!");
   };
 
   return (
     <View style={styles.container}>
-
-      {/* Overlay for form */}
       <View style={styles.overlay}>
         <Text style={styles.title}>Login</Text>
 
@@ -104,10 +80,9 @@ const Login: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* Google Login Button */}
         <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
           <Image
-            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' }}  // Google logo
+            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' }}
             style={styles.googleLogo}
           />
           <Text style={styles.googleButtonText}>Sign in with Google</Text>
@@ -121,7 +96,8 @@ const Login: React.FC = () => {
       </View>
     </View>
   );
-}
+};
+
 
 const styles = StyleSheet.create({
   container: {
@@ -132,6 +108,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+   
   },
   title: {
     fontSize: 32,
