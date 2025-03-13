@@ -36,7 +36,7 @@ const Login: React.FC = () => {
     setTimeout(() => {
       setLoading(false);
       alert('Login successful!');
-      router.push('/home');
+      router.push('/home')
     }, 1000);
   };
 
