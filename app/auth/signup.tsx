@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import BouncyCheckbox from 'react-native-bouncy-checkbox'; // ✅ Replacing react-native-elements
 import { useNavigation } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
@@ -18,48 +19,71 @@ import { useRouter } from 'expo-router';
 
 interface SignUpFormData {
   name: string;
-  lastName: string;
   mobile: string;
   address: string;
   email: string;
   pincode: string;
   location: string;
   password: string;
+  role: "user" | "admin"; // ✅ Fixing the type issue
+  truckOwnerName?: string;
+  truckId?: string;
+  truckCapacity?: string;
+  truckType?: string;
 }
 
-const schema = yup.object().shape({
+// Validation Schema
+const schema = yup.object({
   name: yup.string().required('Customer name is required'),
-  mobile: yup
-    .string()
-    .min(10, 'Mobile number must be at least 10 digits')
-    .required('Mobile number is required'),
+  mobile: yup.string().matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits').required('Mobile number is required'),
   address: yup.string().required('Address is required'),
   email: yup.string().email('Invalid email format').required('Email is required'),
-  pincode: yup
-    .string()
-    .matches(/^[0-9]{6}$/, 'PIN Code must be 6 digits')
-    .required('PIN Code is required'),
+  pincode: yup.string().matches(/^[0-9]{6}$/, 'PIN Code must be 6 digits').required('PIN Code is required'),
   location: yup.string().required('Location is required'),
   password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
-  lastName: yup.string().required('Last Name is required'),
+  role: yup.mixed<"user" | "admin">().oneOf(['user', 'admin']).required('Role is required'),
+
+  truckOwnerName: yup.string().when('role', {
+    is: "admin",
+    then: (schema) => schema.required('Truck Owner Name is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  truckId: yup.string().when('role', {
+    is: "admin",
+    then: (schema) => schema.required('Truck ID is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  truckCapacity: yup.string().when('role', {
+    is: "admin",
+    then: (schema) => schema.required('Truck Capacity is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  truckType: yup.string().when('role', {
+    is: "admin",
+    then: (schema) => schema.required('Truck Type is required'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 export default function SignUp() {
   const navigation = useNavigation();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<SignUpFormData>({
     resolver: yupResolver(schema),
+    defaultValues: {
+      role: 'user', // Default role is 'user'
+    },
   });
 
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false });
   }, []);
 
   const onSubmit = (data: SignUpFormData) => {
@@ -78,7 +102,8 @@ export default function SignUp() {
           <View style={styles.formContainer}>
             <Text style={styles.title}>Register</Text>
 
-            {['name', 'lastName', 'mobile', 'email', 'password', 'location'].map((field) => (
+            {/* Common Input Fields */}
+            {['name', 'email', 'mobile', 'password', 'location'].map((field) => (
               <Controller
                 key={field}
                 control={control}
@@ -102,10 +127,57 @@ export default function SignUp() {
               />
             ))}
 
+            {/* Role Selection */}
+            <View style={styles.checkboxContainer}>
+              <BouncyCheckbox
+                size={25}
+                fillColor="green"
+                unFillColor="#FFFFFF"
+                text="Register as Admin"
+                iconStyle={{ borderColor: 'green' }}
+                innerIconStyle={{ borderWidth: 2 }}
+                textStyle={{ textDecorationLine: 'none' }}
+                isChecked={isAdmin}
+                onPress={(checked: boolean) => {
+                  setIsAdmin(checked);
+                  setValue('role', checked ? 'admin' : 'user', { shouldValidate: true });
+                }}
+              />
+            </View>
+
+            {/* Admin Fields */}
+            {isAdmin && (
+              <>
+                {['truck Owner Name', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
+                  <Controller
+                    key={field}
+                    control={control}
+                    name={field as keyof SignUpFormData}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <View style={styles.inputContainer}>
+                        <TextInput
+                          style={styles.input}
+                          placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                        />
+                        {errors[field as keyof SignUpFormData] && (
+                          <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
+                        )}
+                      </View>
+                    )}
+                  />
+                ))}
+              </>
+            )}
+
+            {/* Submit Button */}
             <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
 
+            {/* Login Redirect */}
             <TouchableOpacity onPress={() => router.push('/auth/signin')}>
               <Text style={styles.link}>Already have an account? Login</Text>
             </TouchableOpacity>
@@ -117,54 +189,14 @@ export default function SignUp() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  formContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-    width: '100%',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    marginBottom: 15,
-    height: 50,
-    width: 300
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
-    backgroundColor: '#fff',
-  },
-  error: {
-    color: 'red',
-    fontSize: 12,
-  },
-  button: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  link: {
-    textAlign: 'center',
-    marginTop: 10,
-    color: '#007BFF',
-  },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  formContainer: { flex: 1, justifyContent: 'center', padding: 20, width: '100%' },
+  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  inputContainer: { marginBottom: 15, height: 50, width: 300 },
+  input: { height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 5, paddingLeft: 10, backgroundColor: '#fff' },
+  error: { color: 'red', fontSize: 12 },
+  checkboxContainer: { marginVertical: 10 },
+  button: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 5, alignItems: 'center' },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  link: { textAlign: 'center', marginTop: 10, color: '#007BFF' },
 });

@@ -6,8 +6,6 @@ import { useRouter } from 'expo-router';
 
 export default function home() {
     const router = useRouter();
-    router.push('/categories');
-
 
   return (
     <View>
