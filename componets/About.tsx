@@ -1,26 +1,19 @@
 import React from "react";
 import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import Navbar from "@/componets/Navbar";
 
 const categories = [
-  { id: 1, name: "Drinking Water Delivery", image: require("../assets/drinking_water.png") },
-  { id: 2, name: "Construction Water Supply", image: require("../assets/construction_water.png") },
-  { id: 3, name: "Agricultural Water Trucks", image: require("../assets/agriculture_water.png") },
-  { id: 4, name: "Emergency Water Supply", image: require("../assets/emergency_water.png") },
+  { id: 1, name: "Drinking Water Delivery", image: require("../assets/images/Drinking.png") },
+  { id: 2, name: "Construction Water Supply", image: require("../assets/images/Construction.png") },
+  { id: 3, name: "Agricultural Water Trucks", image: require("../assets/images/Agri.png") },
+  { id: 4, name: "Emergency Water Supply", image: require("../assets/images/Emergency.png") },
 ];
 
-const home = () => {
+const Home = () => {
   return (
     <View style={styles.container}>
-      {/* Top Navigation Bar */}
-      <View style={styles.navbar}>
-        <Image source={require("../assets/logo.png")} style={styles.logo} />
-        <View style={styles.navLinks}>
-          <Text style={styles.navText}>Home</Text>
-          <Text style={styles.navText}>About us</Text>
-          <Text style={styles.navText}>Contact</Text>
-        </View>
-      </View>
+      <Navbar /> {/* Navbar remains on all pages */}
 
       <ScrollView style={styles.content}>
         {/* Search Bar */}
@@ -31,7 +24,7 @@ const home = () => {
 
         {/* Welcome Banner */}
         <View style={styles.banner}>
-          <Image source={require("../assets/water_banner.png")} style={styles.bannerImage} />
+          <Image source={require("../assets/images/banner.png")} style={styles.bannerImage} />
           <Text style={styles.welcomeText}>Welcome to Water Supply Services</Text>
         </View>
 
@@ -46,24 +39,12 @@ const home = () => {
           ))}
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation Bar */}
-      <View style={styles.bottomNav}>
-        <FontAwesome name="arrow-left" size={24} color="black" />
-        <FontAwesome name="map-marker" size={24} color="black" />
-        <FontAwesome name="phone" size={24} color="black" />
-        <FontAwesome name="home" size={24} color="black" />
-      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-  navbar: { backgroundColor: "#800080", paddingVertical: 15, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 15 },
-  logo: { width: 40, height: 40 },
-  navLinks: { flexDirection: "row", gap: 15 },
-  navText: { color: "white", fontSize: 16 },
   content: { paddingHorizontal: 15 },
   searchBar: { flexDirection: "row", backgroundColor: "#f7c1e0", borderRadius: 20, padding: 10, alignItems: "center", marginTop: 15 },
   searchIcon: { marginLeft: 10 },
@@ -76,7 +57,6 @@ const styles = StyleSheet.create({
   categoryCard: { backgroundColor: "#f0f0f0", borderRadius: 10, padding: 10, alignItems: "center", width: "48%", marginBottom: 15 },
   categoryImage: { width: 100, height: 100 },
   categoryText: { fontSize: 14, fontWeight: "500", textAlign: "center", marginTop: 5 },
-  bottomNav: { backgroundColor: "#d8a7e0", paddingVertical: 15, flexDirection: "row", justifyContent: "space-around", alignItems: "center" }
 });
 
-export default home;
+export default Home;

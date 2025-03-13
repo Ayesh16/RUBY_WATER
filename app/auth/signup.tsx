@@ -9,8 +9,9 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  ImageBackground,
 } from 'react-native';
-import BouncyCheckbox from 'react-native-bouncy-checkbox'; // ✅ Replacing react-native-elements
+import BouncyCheckbox from 'react-native-bouncy-checkbox'; 
 import { useNavigation } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
@@ -25,7 +26,7 @@ interface SignUpFormData {
   pincode: string;
   location: string;
   password: string;
-  role: "user" | "admin"; // ✅ Fixing the type issue
+  role: "user" | "admin"; 
   truck_OwnerName?: string;
   truck_Id?: string;
   truck_Capacity?: string;
@@ -78,7 +79,7 @@ export default function SignUp() {
   } = useForm<SignUpFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      role: 'user', // Default role is 'user'
+      role: 'user', 
     },
   });
 
@@ -93,110 +94,129 @@ export default function SignUp() {
   };
 
   return (
-    <View style={styles.container}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.formContainer}>
-            <Text style={styles.title}>Register</Text>
+    <ImageBackground 
+      source={require('../../assets/images/background.png')} // ✅ Adjust the path if needed
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Register</Text>
 
-            {/* Common Input Fields */}
-            {['name', 'email', 'mobile', 'password', 'location'].map((field) => (
-              <Controller
-                key={field}
-                control={control}
-                name={field as keyof SignUpFormData}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      secureTextEntry={field === 'password'}
-                      keyboardType={field === 'mobile' ? 'numeric' : 'default'}
+              {/* Common Input Fields */}
+              {['name', 'email', 'mobile', 'password', 'location'].map((field) => (
+                <Controller
+                  key={field}
+                  control={control}
+                  name={field as keyof SignUpFormData}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        secureTextEntry={field === 'password'}
+                        keyboardType={field === 'mobile' ? 'numeric' : 'default'}
+                      />
+                      {errors[field as keyof SignUpFormData] && (
+                        <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
+                      )}
+                    </View>
+                  )}
+                />
+              ))}
+
+              {/* Role Selection */}
+              <View style={styles.checkboxContainer}>
+                <BouncyCheckbox
+                  size={25}
+                  fillColor="green"
+                  unFillColor="#FFFFFF"
+                  text="Register as Admin"
+                  iconStyle={{ borderColor: 'green' }}
+                  innerIconStyle={{ borderWidth: 2 }}
+                  textStyle={{ textDecorationLine: 'none', color: 'white' }}
+                  isChecked={isAdmin}
+                  onPress={(checked: boolean) => {
+                    setIsAdmin(checked);
+                    setValue('role', checked ? 'admin' : 'user', { shouldValidate: true });
+                  }}
+                />
+              </View>
+
+              {/* Admin Fields */}
+              {isAdmin && (
+                <>
+                  {['truck_OwnerName', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
+                    <Controller
+                      key={field}
+                      control={control}
+                      name={field as keyof SignUpFormData}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <View style={styles.inputContainer}>
+                          <TextInput
+                            style={styles.input}
+                            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                          />
+                          {errors[field as keyof SignUpFormData] && (
+                            <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
+                          )}
+                        </View>
+                      )}
                     />
-                    {errors[field as keyof SignUpFormData] && (
-                      <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
-                    )}
-                  </View>
-                )}
-              />
-            ))}
+                  ))}
+                </>
+              )}
 
-            {/* Role Selection */}
-            <View style={styles.checkboxContainer}>
-              <BouncyCheckbox
-                size={25}
-                fillColor="green"
-                unFillColor="#FFFFFF"
-                text="Register as Admin"
-                iconStyle={{ borderColor: 'green' }}
-                innerIconStyle={{ borderWidth: 2 }}
-                textStyle={{ textDecorationLine: 'none' }}
-                isChecked={isAdmin}
-                onPress={(checked: boolean) => {
-                  setIsAdmin(checked);
-                  setValue('role', checked ? 'admin' : 'user', { shouldValidate: true });
-                }}
-              />
+              {/* Submit Button */}
+              <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
+                <Text style={styles.buttonText}>Sign Up</Text>
+              </TouchableOpacity>
+
+              {/* Login Redirect */}
+              <TouchableOpacity onPress={() => router.push('/auth/signin')}>
+                <Text style={styles.link}>Already have an account? Login</Text>
+              </TouchableOpacity>
             </View>
-
-            {/* Admin Fields */}
-            {isAdmin && (
-              <>
-                {['truck_OwnerName', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
-                  <Controller
-                    key={field}
-                    control={control}
-                    name={field as keyof SignUpFormData}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <View style={styles.inputContainer}>
-                        <TextInput
-                          style={styles.input}
-                          placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                        />
-                        {errors[field as keyof SignUpFormData] && (
-                          <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
-                        )}
-                      </View>
-                    )}
-                  />
-                ))}
-              </>
-            )}
-
-            {/* Submit Button */}
-            <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-              <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
-
-            {/* Login Redirect */}
-            <TouchableOpacity onPress={() => router.push('/auth/signin')}>
-              <Text style={styles.link}>Already have an account? Login</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Dark overlay for better contrast
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   formContainer: { flex: 1, justifyContent: 'center', padding: 20, width: '100%' },
-  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: 'white' },
   inputContainer: { marginBottom: 15, height: 50, width: 300 },
   input: { height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 5, paddingLeft: 10, backgroundColor: '#fff' },
   error: { color: 'red', fontSize: 12 },
-  checkboxContainer: { marginVertical: 10 },
   button: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 5, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  link: { textAlign: 'center', marginTop: 10, color: '#007BFF' },
+  link: { textAlign: 'center', marginTop: 10, color: '#FFD700' },
+  checkboxContainer: { // ✅ Added this missing style
+    marginVertical: 10,
+    alignItems: 'flex-start', 
+  },
 });

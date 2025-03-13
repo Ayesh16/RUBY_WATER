@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
-  Text, 
+  Text,
+  ImageBackground, 
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
@@ -44,7 +45,11 @@ const Login: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground 
+      source={require('../../assets/images/background.png')} // Change to your image path
+      style={styles.background}
+      resizeMode="cover"
+    >
       <View style={styles.overlay}>
         <Text style={styles.title}>Login</Text>
 
@@ -94,45 +99,46 @@ const Login: React.FC = () => {
           </Text>
         </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
+    width: "100%",
+    height: "100%",
   },
   overlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-   
+    backgroundColor: "rgba(0,0,0,0.4)", // Optional overlay for contrast
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 30,
-    color: 'black',  // Keep text white for contrast
+    color: 'white',
     textAlign: 'center',
   },
   inputContainer: {
     marginBottom: 15,
     width: 300,
-    height: 50
-
+    height: 50,
   },
   input: {
     height: 50,
-    borderColor: '#fff',  // Keep lighter border for input fields
+    borderColor: '#fff',
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',  // Keep semi-transparent input background
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',  // Dark text color inside inputs
+    color: '#333',
   },
   errorMessage: {
     color: '#f44336',
@@ -180,7 +186,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   signupLink: {
-    color: 'black',  // Keep signup link white
+    color: 'white',
     textDecorationLine: 'underline',
     fontSize: 16,
   },
