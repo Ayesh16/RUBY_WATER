@@ -1,14 +1,26 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 
 const Navbar = () => {
+  const router = useRouter(); // Initialize the router
+
   return (
     <View style={styles.navbar}>
+      {/* Logo */}
       <Image source={require("../assets/images/logo.png")} style={styles.logo} />
+
+      {/* Navigation Links */}
       <View style={styles.navLinks}>
-        <Text style={styles.navText}>Home</Text>
-        <Text style={styles.navText}>About us</Text>
-        <Text style={styles.navText}>Contact</Text>
+        <TouchableOpacity onPress={() => router.push("/home")}>
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/about")}>
+          <Text style={styles.navText}>About</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/contact")}>
+          <Text style={styles.navText}>Contact</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
