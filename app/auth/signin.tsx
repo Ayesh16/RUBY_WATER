@@ -10,6 +10,7 @@ import {
   Image 
 } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -24,29 +25,60 @@ const Login: React.FC = () => {
     navigation.setOptions({
       headerShown: false,
     });
+    checkLoginStatus();
   }, []);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       setErrorMessage('Please fill out both email and password fields.');
       return;
     }
-    
+  
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert('Login successful!');
-      router.push('/home')
-    }, 1000);
+  
+    try {
+      const storedUser = await AsyncStorage.getItem('user');
+  
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+  
+        if (parsedUser.email === email && parsedUser.password === password) {
+          alert('Login successful!');
+          await AsyncStorage.setItem('user', JSON.stringify({ ...parsedUser, isLoggedIn: true }));
+          router.push('/home');
+        } else {
+          setErrorMessage('Invalid email or password.');
+        }
+      } else {
+        setErrorMessage('User not found. Please register first.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setErrorMessage('An error occurred. Please try again.');
+    }
+  
+    setLoading(false);
+  };
+  
+  const checkLoginStatus = async () => {
+    const user = await AsyncStorage.getItem('user');
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      if (parsedUser.isLoggedIn) {
+        router.push('/home');
+      }
+    }
   };
 
-  const handleGoogleLogin = () => {
-    alert("Google Login clicked!");
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('user');
+    alert('Logged out successfully!');
+    router.push('/auth/signin');
   };
 
   return (
     <ImageBackground 
-      source={require('../../assets/images/background.png')} // Change to your image path
+      source={require('../../assets/images/background.png')} 
       style={styles.background}
       resizeMode="cover"
     >
@@ -85,7 +117,7 @@ const Login: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
+        <TouchableOpacity style={styles.googleButton} onPress={() => alert("Google Login clicked!") }>
           <Image
             source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' }}
             style={styles.googleLogo}
@@ -103,7 +135,6 @@ const Login: React.FC = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -115,7 +146,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: "rgba(0,0,0,0.2)", // Optional overlay for contrast
+    backgroundColor: "rgba(0,0,0,0.2)",
   },
   title: {
     fontSize: 32,

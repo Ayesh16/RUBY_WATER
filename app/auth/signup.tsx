@@ -11,6 +11,7 @@ import {
   Platform,
   ImageBackground,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BouncyCheckbox from 'react-native-bouncy-checkbox'; 
 import { useNavigation } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
@@ -33,7 +34,6 @@ interface SignUpFormData {
   truck_Type?: string;
 }
 
-// Validation Schema
 const schema = yup.object({
   name: yup.string().required('Customer name is required'),
   mobile: yup.string().matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits').required('Mobile number is required'),
@@ -42,27 +42,23 @@ const schema = yup.object({
   pincode: yup.string().matches(/^[0-9]{6}$/, 'PIN Code must be 6 digits').required('PIN Code is required'),
   location: yup.string().required('Location is required'),
   password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
-  role: yup.mixed<"user" | "admin">().oneOf(['user', 'admin']).required('Role is required'),
-
+  role: yup.mixed<'user' | 'admin'>().oneOf(['user', 'admin']).required('Role is required'),
+  
   truck_OwnerName: yup.string().when('role', {
     is: "admin",
     then: (schema) => schema.required('Truck Owner Name is required'),
-    otherwise: (schema) => schema.notRequired(),
   }),
   truck_Id: yup.string().when('role', {
     is: "admin",
     then: (schema) => schema.required('Truck ID is required'),
-    otherwise: (schema) => schema.notRequired(),
   }),
   truck_Capacity: yup.string().when('role', {
     is: "admin",
     then: (schema) => schema.required('Truck Capacity is required'),
-    otherwise: (schema) => schema.notRequired(),
   }),
   truck_Type: yup.string().when('role', {
     is: "admin",
     then: (schema) => schema.required('Truck Type is required'),
-    otherwise: (schema) => schema.notRequired(),
   }),
 });
 
@@ -87,15 +83,19 @@ export default function SignUp() {
     navigation.setOptions({ headerShown: false });
   }, []);
 
-  const onSubmit = (data: SignUpFormData) => {
-    console.log('Form Data:', data);
-    Alert.alert('Success', 'Account created successfully!');
-    router.push('/auth/signin');
+  const onSubmit = async (data: SignUpFormData) => {
+    try {
+      await AsyncStorage.setItem('user', JSON.stringify(data));
+      Alert.alert('Success', 'Account created successfully!');
+      router.push('/auth/signin');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save user data');
+    }
   };
 
   return (
     <ImageBackground 
-      source={require('../../assets/images/background.png')} // ✅ Adjust the path if needed
+      source={require('../../assets/images/background.png')}
       style={styles.background}
       resizeMode="cover"
     >
@@ -107,9 +107,9 @@ export default function SignUp() {
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={styles.formContainer}>
               <Text style={styles.title}>Register</Text>
-
-              {/* Common Input Fields */}
-              {['name', 'email', 'mobile', 'password', 'location'].map((field) => (
+              
+              {/* Standard User Fields */}
+              {['name', 'email', 'mobile', 'address', 'pincode', 'location', 'password'].map((field) => (
                 <Controller
                   key={field}
                   control={control}
@@ -121,9 +121,8 @@ export default function SignUp() {
                         placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                         onBlur={onBlur}
                         onChangeText={onChange}
-                        value={value}
+                        value={value ?? ''} // Fix for uncontrolled input
                         secureTextEntry={field === 'password'}
-                        keyboardType={field === 'mobile' ? 'numeric' : 'default'}
                       />
                       {errors[field as keyof SignUpFormData] && (
                         <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
@@ -133,16 +132,12 @@ export default function SignUp() {
                 />
               ))}
 
-              {/* Role Selection */}
+              {/* Checkbox for Admin */}
               <View style={styles.checkboxContainer}>
                 <BouncyCheckbox
                   size={25}
                   fillColor="green"
-                  unFillColor="#FFFFFF"
                   text="Register as Admin"
-                  iconStyle={{ borderColor: 'green' }}
-                  innerIconStyle={{ borderWidth: 2 }}
-                  textStyle={{ textDecorationLine: 'none', color: 'white' }}
                   isChecked={isAdmin}
                   onPress={(checked: boolean) => {
                     setIsAdmin(checked);
@@ -151,42 +146,38 @@ export default function SignUp() {
                 />
               </View>
 
-              {/* Admin Fields */}
-              {isAdmin && (
-                <>
-                  {['truck_OwnerName', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
-                    <Controller
-                      key={field}
-                      control={control}
-                      name={field as keyof SignUpFormData}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <View style={styles.inputContainer}>
-                          <TextInput
-                            style={styles.input}
-                            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                          />
-                          {errors[field as keyof SignUpFormData] && (
-                            <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
-                          )}
-                        </View>
+              {/* Admin-Specific Fields */}
+              {isAdmin && ['truck_OwnerName', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
+                <Controller
+                  key={field}
+                  control={control}
+                  name={field as keyof SignUpFormData}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder={field.replace('_', ' ')}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value ?? ''} // Ensures a controlled component
+                      />
+                      {errors[field as keyof SignUpFormData] && (
+                        <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
                       )}
-                    />
-                  ))}
-                </>
-              )}
+                    </View>
+                  )}
+                />
+              ))}
 
-              {/* Submit Button */}
+              {/* Sign Up Button */}
               <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
                 <Text style={styles.buttonText}>Sign Up</Text>
               </TouchableOpacity>
-
-              {/* Login Redirect */}
-              <TouchableOpacity onPress={() => router.push('/auth/signin')}>
-                <Text style={styles.link}>Already have an account? Login</Text>
-              </TouchableOpacity>
+               <View style={styles.signinLinkContainer}>
+                        <Text style={styles.signinLink} onPress={() => router.push('/auth/signin')}>
+                          Already an user? Login
+                        </Text>
+              </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -195,6 +186,7 @@ export default function SignUp() {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -203,7 +195,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Dark overlay for better contrast
+    backgroundColor: 'rgba(0, 0, 0, 0.2)', 
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -214,9 +206,15 @@ const styles = StyleSheet.create({
   error: { color: 'red', fontSize: 12 },
   button: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 5, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  link: { textAlign: 'center', marginTop: 10, color: '#FFD700' },
-  checkboxContainer: { // ✅ Added this missing style
-    marginVertical: 10,
-    alignItems: 'flex-start', 
+  checkboxContainer: { marginVertical: 10, alignItems: 'flex-start' },
+  signinLinkContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  signinLink: {
+    color: 'white',
+    textDecorationLine: 'underline',
+    fontSize: 16,
   },
 });
