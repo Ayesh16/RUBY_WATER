@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: "row",
-    marginTop: 15,
+    marginTop: 30,
     marginLeft:'25%',
     gap:24
   },
