@@ -134,17 +134,28 @@ export default function SignUp() {
 
               {/* Checkbox for Admin */}
               <View style={styles.checkboxContainer}>
-                <BouncyCheckbox
-                  size={25}
-                  fillColor="green"
-                  text="Register as Admin"
-                  isChecked={isAdmin}
-                  onPress={(checked: boolean) => {
-                    setIsAdmin(checked);
-                    setValue('role', checked ? 'admin' : 'user', { shouldValidate: true });
-                  }}
-                />
-              </View>
+  <BouncyCheckbox
+    size={25}
+    fillColor="green"
+    text="Register as Admin"
+    isChecked={isAdmin}
+    onPress={(checked: boolean) => {
+      setIsAdmin(checked);
+      setValue('role', checked ? 'admin' : 'user', { shouldValidate: true });
+    }}
+    textStyle={{
+      textDecorationLine: "none", // Prevents strikethrough
+      color: "white", // Ensures proper visibility
+      fontSize: 16, // Adjust font size
+    }}
+    innerIconStyle={{
+      borderWidth: 2, // Makes checkbox border more visible
+      borderColor: "white", 
+    }}
+    style={{ marginBottom: 10 }} // Adds space below to prevent overlap
+  />
+</View>
+
 
               {/* Admin-Specific Fields */}
               {isAdmin && ['truck_OwnerName', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
