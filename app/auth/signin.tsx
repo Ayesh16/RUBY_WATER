@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -31,6 +32,11 @@ const Login: React.FC = () => {
   const handleLogin = async () => {
     if (!email || !password) {
       setErrorMessage('Please fill out both email and password fields.');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please fill in all fields.',
+      });
       return;
     }
   
@@ -43,18 +49,37 @@ const Login: React.FC = () => {
         const parsedUser = JSON.parse(storedUser);
   
         if (parsedUser.email === email && parsedUser.password === password) {
-          alert('Login successful!');
+          Toast.show({
+            type: 'success',
+            text1: 'Login Successful',
+            text2: 'Welcome back!',
+          });
           await AsyncStorage.setItem('user', JSON.stringify({ ...parsedUser, isLoggedIn: true }));
           router.push('/home');
         } else {
           setErrorMessage('Invalid email or password.');
+          Toast.show({
+            type: 'error',
+            text1: 'Invalid Credentials',
+            text2: 'Incorrect email or password.',
+          });
         }
       } else {
         setErrorMessage('User not found. Please register first.');
+        Toast.show({
+          type: 'error',
+          text1: 'User Not Found',
+          text2: 'Please register first.',
+        });
       }
     } catch (error) {
       console.error('Error during login:', error);
       setErrorMessage('An error occurred. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: 'Login Error',
+        text2: 'Something went wrong. Try again.',
+      });
     }
   
     setLoading(false);
@@ -72,7 +97,11 @@ const Login: React.FC = () => {
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('user');
-    alert('Logged out successfully!');
+    Toast.show({
+      type: 'info',
+      text1: 'Logged Out',
+      text2: 'You have successfully logged out.',
+    });
     router.push('/auth/signin');
   };
 
@@ -107,8 +136,6 @@ const Login: React.FC = () => {
           />
         </View>
 
-        {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
-
         {loading ? (
           <ActivityIndicator size="large" color="#4CAF50" />
         ) : (
@@ -123,6 +150,9 @@ const Login: React.FC = () => {
           </Text>
         </View>
       </View>
+
+      {/* Toast Message Component */}
+      <Toast />
     </ImageBackground>
   );
 };
@@ -163,12 +193,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-  errorMessage: {
-    color: '#f44336',
-    fontSize: 14,
-    marginBottom: 10,
-    textAlign: 'center',
-  },
   button: {
     backgroundColor: '#4CAF50',
     padding: 15,
@@ -180,27 +204,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
-  },
-  googleButton: {
-    backgroundColor: '#4285F4',
-    padding: 15,
-    borderRadius: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    width: 300,
-    maxWidth: 350,
-  },
-  googleLogo: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-  },
-  googleButtonText: {
-    color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
   },
   signupLinkContainer: {
