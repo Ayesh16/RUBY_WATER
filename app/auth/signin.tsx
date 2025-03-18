@@ -55,7 +55,9 @@ const Login: React.FC = () => {
             text2: 'Welcome back!',
           });
           await AsyncStorage.setItem('user', JSON.stringify({ ...parsedUser, isLoggedIn: true }));
-          router.push('/home');
+          setTimeout(() => {
+            router.push('/home');
+          }, 2000);
         } else {
           setErrorMessage('Invalid email or password.');
           Toast.show({

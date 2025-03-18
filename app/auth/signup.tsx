@@ -5,19 +5,17 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
-  ScrollView,
   Platform,
   ImageBackground,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BouncyCheckbox from 'react-native-bouncy-checkbox'; 
-import { useNavigation } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useRouter } from 'expo-router';
+import Toast from 'react-native-toast-message';
 
 interface SignUpFormData {
   name: string;
@@ -86,10 +84,20 @@ export default function SignUp() {
   const onSubmit = async (data: SignUpFormData) => {
     try {
       await AsyncStorage.setItem('user', JSON.stringify(data));
-      Alert.alert('Success', 'Account created successfully!');
-      router.push('/auth/signin');
+      Toast.show({
+        type: 'success',
+        text1: 'Registration Successful',
+        text2: 'Your account has been created!',
+      });
+      setTimeout(() => {
+        router.push('/auth/signin');
+      }, 2000);
     } catch (error) {
-      Alert.alert('Error', 'Failed to save user data');
+      Toast.show({
+        type: 'error',
+        text1: 'Registration Failed',
+        text2: 'An error occurred while creating your account.',
+      });
     }
   };
 
@@ -104,112 +112,57 @@ export default function SignUp() {
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-        
-            <View style={styles.formContainer}>
-              <Text style={styles.title}>Register</Text>
-              
-              {/* Standard User Fields */}
-              {['name', 'email', 'mobile', 'address', 'pincode', 'location', 'password'].map((field) => (
-                <Controller
-                  key={field}
-                  control={control}
-                  name={field as keyof SignUpFormData}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <View style={styles.inputContainer}>
-                      <TextInput
-                        style={styles.input}
-                        placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value ?? ''} // Fix for uncontrolled input
-                        secureTextEntry={field === 'password'}
-                      />
-                      {errors[field as keyof SignUpFormData] && (
-                        <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
-                      )}
-                    </View>
-                  )}
-                />
-              ))}
-
-              {/* Checkbox for Admin */}
-              <View style={styles.checkboxContainer}>
-  <BouncyCheckbox
-    size={25}
-    fillColor="green"
-    text="Register as Admin"
-    isChecked={isAdmin}
-    onPress={(checked: boolean) => {
-      setIsAdmin(checked);
-      setValue('role', checked ? 'admin' : 'user', { shouldValidate: true });
-    }}
-    textStyle={{
-      textDecorationLine: "none", // Prevents strikethrough
-      color: "white", // Ensures proper visibility
-      fontSize: 16, // Adjust font size
-    }}
-    innerIconStyle={{
-      borderWidth: 2, // Makes checkbox border more visible
-      borderColor: "white", 
-    }}
-    style={{ marginBottom: 10 }} // Adds space below to prevent overlap
-  />
-</View>
-
-
-              {/* Admin-Specific Fields */}
-              {isAdmin && ['truck_OwnerName', 'truck_Id', 'truck_Capacity', 'truck_Type'].map((field) => (
-                <Controller
-                  key={field}
-                  control={control}
-                  name={field as keyof SignUpFormData}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <View style={styles.inputContainer}>
-                      <TextInput
-                        style={styles.input}
-                        placeholder={field.replace('_', ' ')}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value ?? ''} // Ensures a controlled component
-                      />
-                      {errors[field as keyof SignUpFormData] && (
-                        <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
-                      )}
-                    </View>
-                  )}
-                />
-              ))}
-
-              {/* Sign Up Button */}
-              <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-                <Text style={styles.buttonText}>Sign Up</Text>
-              </TouchableOpacity>
-               <View style={styles.signinLinkContainer}>
-                        <Text style={styles.signinLink} onPress={() => router.push('/auth/signin')}>
-                          Already an user? Login
-                        </Text>
-              </View>
-            </View>
-          
+          <View style={styles.formContainer}>
+            <Text style={styles.title}>Register</Text>
+            {['name', 'email', 'mobile', 'address', 'pincode', 'location', 'password'].map((field) => (
+              <Controller
+                key={field}
+                control={control}
+                name={field as keyof SignUpFormData}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value ?? ''}
+                      secureTextEntry={field === 'password'}
+                    />
+                    {errors[field as keyof SignUpFormData] && (
+                      <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
+                    )}
+                  </View>
+                )}
+              />
+            ))}
+            <BouncyCheckbox
+              size={25}
+              fillColor="green"
+              text="Register as Admin"
+              isChecked={isAdmin}
+              onPress={(checked: boolean) => {
+                setIsAdmin(checked);
+                setValue('role', checked ? 'admin' : 'user', { shouldValidate: true });
+              }}
+              textStyle={{ textDecorationLine: "none", color: "white", fontSize: 16 }}
+              innerIconStyle={{ borderWidth: 2, borderColor: "white" }}
+              style={{ marginBottom: 10 }}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
+              <Text style={styles.buttonText}>Sign Up</Text>
+            </TouchableOpacity>
+            <Toast />
+          </View>
         </KeyboardAvoidingView>
       </View>
     </ImageBackground>
   );
 }
 
-// Styles
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)', 
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  background: { flex: 1, width: '100%', height: '100%' },
+  overlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.2)', justifyContent: 'center', alignItems: 'center' },
   formContainer: { flex: 1, justifyContent: 'center', padding: 20, width: '100%' },
   title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: 'white' },
   inputContainer: { marginBottom: 15, height: 50, width: 300 },
@@ -217,15 +170,4 @@ const styles = StyleSheet.create({
   error: { color: 'red', fontSize: 12 },
   button: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 5, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  checkboxContainer: { marginVertical: 10, alignItems: 'flex-start' },
-  signinLinkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  signinLink: {
-    color: 'white',
-    textDecorationLine: 'underline',
-    fontSize: 16,
-  },
 });
