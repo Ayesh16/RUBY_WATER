@@ -117,14 +117,6 @@ const Login: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.googleButton} onPress={() => alert("Google Login clicked!") }>
-          <Image
-            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' }}
-            style={styles.googleLogo}
-          />
-          <Text style={styles.googleButtonText}>Sign in with Google</Text>
-        </TouchableOpacity>
-
         <View style={styles.signupLinkContainer}>
           <Text style={styles.signupLink} onPress={() => router.push('/auth/signup')}>
             New User? Register
