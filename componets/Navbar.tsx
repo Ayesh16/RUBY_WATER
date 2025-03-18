@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const Navbar = () => {
   const router = useRouter();
@@ -30,25 +31,15 @@ const Navbar = () => {
       {/* Logo */}
       <Image source={require("../assets/images/logo.png")} style={styles.logo} />
 
-      {/* Navigation Links */}
-      <View style={styles.navLinks}>
-        <TouchableOpacity onPress={() => router.push("/home")}>
-          <Text style={styles.navText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/about")}>
-          <Text style={styles.navText}>About</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/contact")}>
-          <Text style={styles.navText}>Contact</Text>
-        </TouchableOpacity>
+      {/* User Icon & Logout Button */}
+      <View style={styles.userSection}>
+        <MaterialIcons name="account-circle" size={30} color="white" />
+        {isLoggedIn && (
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <MaterialIcons name="logout" size={18} color="black" />
+          </TouchableOpacity>
+        )}
       </View>
-
-      {/* Logout Button (Only when Logged In) */}
-      {isLoggedIn && (
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
@@ -66,24 +57,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
-  navLinks: {
+  userSection: {
     flexDirection: "row",
-    gap: 15,
-  },
-  navText: {
-    color: "white",
-    fontSize: 16,
+    alignItems: "center",
+    gap: 10,
   },
   logoutButton: {
     backgroundColor: "white",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    padding: 8,
     borderRadius: 5,
-  },
-  logoutText: {
-    color: "black",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });
 
