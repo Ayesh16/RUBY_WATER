@@ -1,9 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Navbar = () => {
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  const checkLoginStatus = async () => {
+    const user = await AsyncStorage.getItem("user");
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      setIsLoggedIn(parsedUser.isLoggedIn);
+    }
+  };
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("user");
+    setIsLoggedIn(false);
+    router.push("/auth/signin");
+  };
 
   return (
     <View style={styles.navbar}>
@@ -22,6 +42,13 @@ const Navbar = () => {
           <Text style={styles.navText}>Contact</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Logout Button (Only when Logged In) */}
+      {isLoggedIn && (
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -46,6 +73,17 @@ const styles = StyleSheet.create({
   navText: {
     color: "white",
     fontSize: 16,
+  },
+  logoutButton: {
+    backgroundColor: "red",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+  },
+  logoutText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
