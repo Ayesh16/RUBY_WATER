@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Linking, StyleSheet, Image } from "react-native";
 import { FontAwesome, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import Navbar from "../componets/Navbar";
+import Navbar from "../components/Navbar";
 
 const Contact: React.FC = () => {
   return (

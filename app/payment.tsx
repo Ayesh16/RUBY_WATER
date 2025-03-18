@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Checkbox } from "react-native-paper";
-import Navbar from "@/componets/Navbar";
+import Navbar from "@/components/Navbar";
 
 const Payment = () => {
   const params = useLocalSearchParams();

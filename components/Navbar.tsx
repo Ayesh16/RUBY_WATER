@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity, TextInput } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 
 const Navbar = () => {
   const router = useRouter();
@@ -30,6 +30,11 @@ const Navbar = () => {
     <View style={styles.navbar}>
       {/* Logo */}
       <Image source={require("../assets/images/logo.png")} style={styles.logo} />
+
+      <View style={styles.searchBar}>
+          <FontAwesome name="search" size={20} color="black" style={styles.searchIcon} />
+          <TextInput placeholder="Search..." style={styles.searchInput} />
+        </View>
 
       {/* User Icon & Logout Button */}
       <View style={styles.userSection}>
@@ -67,6 +72,9 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 5,
   },
+  searchBar: { flexDirection: "row", backgroundColor: "#f7c1e0", borderRadius: 20, padding: 10, alignItems: "center", marginTop: 15 },
+  searchIcon: { marginLeft: 10 },
+  searchInput: { marginLeft: 10  },
 });
 
 export default Navbar;

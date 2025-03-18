@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import Navbar from "@/componets/Navbar";
+import Navbar from "@/components/Navbar";
 
 const Confirmation = () => {
   const router = useRouter();

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import Navbar from "@/componets/Navbar";
+import Navbar from "@/components/Navbar";
 
 const truckModelsData: Record<
   string,

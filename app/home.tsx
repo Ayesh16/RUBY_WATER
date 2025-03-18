@@ -2,7 +2,8 @@ import React from "react";
 import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router"; // Import useRouter
-import Navbar from "@/componets/Navbar";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 
 const categories = [
@@ -20,10 +21,6 @@ const Home = () => {
       <Navbar />
 
       <ScrollView style={styles.content}>
-        <View style={styles.searchBar}>
-          <FontAwesome name="search" size={20} color="black" style={styles.searchIcon} />
-          <TextInput placeholder="Search..." style={styles.searchInput} />
-        </View>
 
         <View style={styles.banner}>
           <Image source={require("../assets/images/banner.png")} style={styles.bannerImage} />
@@ -43,6 +40,7 @@ const Home = () => {
             </TouchableOpacity>
           ))}
         </View>
+        <Footer/>
       </ScrollView>
     </View>
   );
@@ -51,9 +49,6 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F3D6E4" },
   content: { paddingHorizontal: 15 },
-  searchBar: { flexDirection: "row", backgroundColor: "#f7c1e0", borderRadius: 20, padding: 10, alignItems: "center", marginTop: 15 },
-  searchIcon: { marginLeft: 10 },
-  searchInput: { marginLeft: 10, flex: 1 },
   banner: { alignItems: "center", marginTop: 20 },
   bannerImage: { width: 150, height: 150 },
   welcomeText: { fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 10 },

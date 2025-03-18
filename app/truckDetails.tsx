@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import Navbar from "@/componets/Navbar";
+import Navbar from "@/components/Navbar";
 
 const truckDetailsData: Record<string, { image: any; details: string; capacity: string; price: string }> = {
   "Volvo FMX Water Tanker": {
