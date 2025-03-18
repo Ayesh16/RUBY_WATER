@@ -1,8 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Navbar from "@/componets/Navbar";
-
 
 const truckDetailsData: Record<
   string,
@@ -26,7 +25,6 @@ const truckDetailsData: Record<
     capacity: "8,500 liters",
     price: "$65,000",
   },
-  // Add more trucks here...
 };
 
 const TruckDetails = () => {
@@ -47,9 +45,7 @@ const TruckDetails = () => {
   }
 
   const handleBooking = () => {
-    Alert.alert("Booking Confirmed", `You have booked the ${truckName}.`, [
-      { text: "OK", onPress: () => console.log("Booking confirmed") },
-    ]);
+    router.push(`/booking?truck=${encodeURIComponent(truckName)}`);
   };
 
   return (
@@ -82,13 +78,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-},
+  },
   truckImage: {
     width: 250,
     height: 150,
     resizeMode: "contain",
     marginTop: "10%",
-    alignSelf:"center"
+    alignSelf: "center",
   },
   title: {
     fontSize: 24,
@@ -98,7 +94,7 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     alignItems: "center",
-    alignSelf:"center",
+    alignSelf: "center",
     marginTop: 10,
   },
   details: {
@@ -127,7 +123,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 10,
     marginTop: 20,
-    alignSelf:"center"
+    alignSelf: "center",
   },
   goBackButton: {
     backgroundColor: "#ccc",
@@ -145,3 +141,4 @@ const styles = StyleSheet.create({
 });
 
 export default TruckDetails;
+
