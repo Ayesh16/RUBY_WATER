@@ -1,12 +1,9 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Navbar from "@/componets/Navbar";
 
-const truckDetailsData: Record<
-  string,
-  { image: any; details: string; capacity: string; price: string }
-> = {
+const truckDetailsData: Record<string, { image: any; details: string; capacity: string; price: string }> = {
   "Volvo FMX Water Tanker": {
     image: require("../assets/images/volvo_fmx.png"),
     details: "A powerful water tanker truck with high load capacity and durability.",
@@ -19,12 +16,6 @@ const truckDetailsData: Record<
     capacity: "8,000 liters",
     price: "$180",
   },
-  "Isuzu FVR900 Water Truck": {
-    image: require("../assets/images/isuzu_fvr.png"),
-    details: "A lightweight and efficient water supply truck for versatile applications.",
-    capacity: "12,000 liters",
-    price: "$220",
-  },
 };
 
 const TruckDetails = () => {
@@ -33,19 +24,30 @@ const TruckDetails = () => {
   const truck = truckDetailsData[truckName];
   const router = useRouter();
 
+  const [customerDetails, setCustomerDetails] = useState({
+    customer_name: "",
+    address: "",
+    pincode: "",
+  });
+
   if (!truck) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Truck Not Found</Text>
-        <TouchableOpacity style={styles.goBackButton} onPress={() => router.back()}>
-          <Text style={styles.buttonText}>Go Back</Text>
-        </TouchableOpacity>
       </View>
     );
   }
 
-  const handleBooking = () => {
-    router.push(`/booking?truck=${encodeURIComponent(truckName)}`);
+  const handleProceedToPayment = () => {
+    if (!customerDetails.customer_name || !customerDetails.address || !customerDetails.pincode) {
+      Alert.alert("Error", "Please fill in all fields before proceeding.");
+      return;
+    }
+    // Navigate to payment with booking details
+    router.push({
+      pathname: "/payment",
+      params: { truck: truckName, ...customerDetails },
+    });
   };
 
   return (
@@ -56,89 +58,77 @@ const TruckDetails = () => {
 
       <View style={styles.detailsContainer}>
         <Text style={styles.details}>{truck.details}</Text>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Capacity:</Text>
-          <Text style={styles.value}>{truck.capacity}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Price:</Text>
-          <Text style={styles.value}>{truck.price}</Text>
-        </View>
+        <Text style={styles.detailText}>Capacity: {truck.capacity}</Text>
+        <Text style={styles.detailText}>Price: {truck.price}</Text>
       </View>
 
-      {/* Book Now Button */}
-      <TouchableOpacity style={styles.bookButton} onPress={handleBooking}>
-        <Text style={styles.buttonText}>Book Now</Text>
-      </TouchableOpacity>
+      {/* Booking Form */}
+      <View style={styles.bookingContainer}>
+        <Text style={styles.sectionTitle}>Enter Booking Details</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Customer Name"
+          value={customerDetails.customer_name}
+          onChangeText={(text) => setCustomerDetails({ ...customerDetails, customer_name: text })}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Address"
+          value={customerDetails.address}
+          onChangeText={(text) => setCustomerDetails({ ...customerDetails, address: text })}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Pincode"
+          keyboardType="numeric"
+          value={customerDetails.pincode}
+          onChangeText={(text) => setCustomerDetails({ ...customerDetails, pincode: text })}
+        />
+
+        {/* Proceed to Payment Button */}
+        <TouchableOpacity style={styles.bookButton} onPress={handleProceedToPayment}>
+          <Text style={styles.buttonText}>Proceed to Payment</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  container: { flex: 1, backgroundColor: "#F3D6E4"},
+  truckImage: { width: 250, height: 150, resizeMode: "contain", marginTop: 20 ,alignSelf:"center"},
+  title: { fontSize: 24, fontWeight: "bold", marginTop: 10, textAlign: "center" },
+  detailsContainer: { marginTop: 10, alignItems: "center" },
+  details: { fontSize: 16, textAlign: "center", marginBottom: 10 },
+  detailText: { fontSize: 16, color: "#555", marginBottom: 5 },
+  bookingContainer: {
+    width: "50%",
     backgroundColor: "#F3D6E4",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+    alignSelf:"center"
   },
-  truckImage: {
-    width: 250,
-    height: 150,
-    resizeMode: "contain",
-    marginTop: "10%",
-    alignSelf: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 10,
-  },
-  detailsContainer: {
-    alignItems: "center",
-    alignSelf: "center",
-    marginTop: 10,
-  },
-  details: {
+  sectionTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10, textAlign: "center" },
+  input: {
     fontSize: 16,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "80%",
-    paddingVertical: 10,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  value: {
-    fontSize: 18,
-    color: "#555",
+    backgroundColor: "#f9f9f9",
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
   bookButton: {
     backgroundColor: "#007BFF",
     paddingVertical: 12,
-    paddingHorizontal: 30,
     borderRadius: 10,
-    marginTop: 20,
+    marginTop: 15,
     alignSelf: "center",
+    width: "100%",
+    alignItems: "center",
   },
-  goBackButton: {
-    backgroundColor: "#ccc",
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  buttonText: {
-    fontSize: 18,
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
+  buttonText: { fontSize: 18, color: "#fff", fontWeight: "bold" },
 });
 
 export default TruckDetails;
-
