@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Checkbox } from "react-native-paper";
+import Toast from "react-native-toast-message";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -13,19 +14,21 @@ const Payment = () => {
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
 
   const paymentMethods = [
-    { id: "upi", image: require("../assets/images/upi.png"), label: "UPI" },
-    { id: "paypal", image: require("../assets/images/paypal.png"), label: "PayPal" },
-    { id: "visa", image: require("../assets/images/visa.png"), label: "VISA" },
-    { id: "mastercard", image: require("../assets/images/mastercard.png"), label: "MasterCard" },
+    { id: "upi", image: require("../../assets/images/upi.png"), label: "UPI" },
+    { id: "paypal", image: require("../../assets/images/paypal.png"), label: "PayPal" },
+    { id: "visa", image: require("../../assets/images/visa.png"), label: "VISA" },
+    { id: "mastercard", image: require("../../assets/images/mastercard.png"), label: "MasterCard" },
   ];
 
   const handlePayment = () => {
     if (!selectedPayment) {
-      alert("Please select a payment method!");
+      Toast.show({ type: "error", text1: "Payment Error", text2: "Please select a payment method!" });
       return;
     }
-    alert(`Payment successful with ${selectedPayment}!`);
-    router.push("/confirmation");
+    Toast.show({ type: "success", text1: "Payment Successful", text2: `Paid with ${selectedPayment}` });
+    setTimeout(() => {
+      router.push("/Pages/confirmation");
+    }, 2000);
   };
 
   return (
@@ -35,7 +38,7 @@ const Payment = () => {
       <Text style={styles.title}>Payment</Text>
 
       {/* Payment Icon */}
-      <Image source={require("../assets/images/payment_icon.png")} style={styles.paymentIcon} />
+      <Image source={require("../../assets/images/payment_icon.png")} style={styles.paymentIcon} />
 
       {/* Booking & User Details */}
       <View style={styles.infoCard}>
@@ -60,7 +63,7 @@ const Payment = () => {
       {/* Amount */}
       <View style={styles.amountContainer}>
         <Text style={styles.label}>Amount:</Text>
-        <Image source={require("../assets/images/currency_icon.png")} style={styles.currencyIcon} />
+        <Image source={require("../../assets/images/currency_icon.png")} style={styles.currencyIcon} />
         <Text style={styles.value}>{amount}</Text>
       </View>
 
@@ -68,6 +71,7 @@ const Payment = () => {
       <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
         <Text style={styles.buttonText}>Proceed to Pay</Text>
       </TouchableOpacity>
+      <Toast />
       <Footer/>
     </View>
   );

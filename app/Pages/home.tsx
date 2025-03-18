@@ -7,10 +7,10 @@ import Footer from "@/components/Footer";
 
 
 const categories = [
-  { id: 1, name: "drinking", label: "Drinking Water Delivery", image: require("../assets/images/Drinking.png") },
-  { id: 2, name: "construction", label: "Construction Water Supply", image: require("../assets/images/Construction.png") },
-  { id: 3, name: "agriculture", label: "Agricultural Water Trucks", image: require("../assets/images/Agri.png") },
-  { id: 4, name: "emergency", label: "Emergency Water Supply", image: require("../assets/images/Emergency.png") },
+  { id: 1, name: "drinking", label: "Drinking Water Delivery", image: require("../../assets/images/Drinking.png") },
+  { id: 2, name: "construction", label: "Construction Water Supply", image: require("../../assets/images/Construction.png") },
+  { id: 3, name: "agriculture", label: "Agricultural Water Trucks", image: require("../../assets/images/Agri.png") },
+  { id: 4, name: "emergency", label: "Emergency Water Supply", image: require("../../assets/images/Emergency.png") },
 ];
 
 const Home = () => {
@@ -23,7 +23,7 @@ const Home = () => {
       <ScrollView style={styles.content}>
 
         <View style={styles.banner}>
-          <Image source={require("../assets/images/banner.png")} style={styles.bannerImage} />
+          <Image source={require("../../assets/images/banner.png")} style={styles.bannerImage} />
           <Text style={styles.welcomeText}>Welcome to Water Supply Services</Text>
         </View>
 
@@ -33,7 +33,7 @@ const Home = () => {
             <TouchableOpacity 
               key={category.id} 
               style={styles.categoryCard}
-              onPress={() => router.push(`/truckModel?category=${category.name}`)} // FIXED: Passing category name
+              onPress={() => router.push(`/Pages/truckModel?category=${category.name}`)} // FIXED: Passing category name
             >
               <Image source={category.image} style={styles.categoryImage} />
               <Text style={styles.categoryText}>{category.label}</Text>

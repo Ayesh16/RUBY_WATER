@@ -10,17 +10,17 @@ const Footer = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => router.push("/home")} style={styles.footerItem}>
+        <TouchableOpacity onPress={() => router.push("/Pages/home")} style={styles.footerItem}>
           <FontAwesome name="home" size={20} color="white" />
           <Text style={styles.footerText}>Home</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/about")} style={styles.footerItem}>
+        <TouchableOpacity onPress={() => router.push("/Pages/about")} style={styles.footerItem}>
           <FontAwesome name="info-circle" size={20} color="white" />
           <Text style={styles.footerText}>About</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/contact")} style={styles.footerItem}>
+        <TouchableOpacity onPress={() => router.push("/Pages/contact")} style={styles.footerItem}>
           <FontAwesome name="phone" size={20} color="white" />
           <Text style={styles.footerText}>Contact</Text>
         </TouchableOpacity>

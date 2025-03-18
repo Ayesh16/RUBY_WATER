@@ -11,7 +11,7 @@ const Confirmation = () => {
     <View style={styles.container}>
         <Navbar/>
       {/* Success Icon */}
-      <Image source={require("../assets/images/success.png")} style={styles.successIcon} />
+      <Image source={require("../../assets/images/success.png")} style={styles.successIcon} />
 
       {/* Confirmation Message */}
       <Text style={styles.title}>Payment Successful!</Text>
@@ -30,7 +30,7 @@ const Confirmation = () => {
       </View>
 
       {/* Go Home Button */}
-      <TouchableOpacity style={styles.homeButton} onPress={() => router.push("/home")}>
+      <TouchableOpacity style={styles.homeButton} onPress={() => router.push("/Pages/home")}>
         <Text style={styles.buttonText}>Go to Home</Text>
       </TouchableOpacity>
       <Footer/>

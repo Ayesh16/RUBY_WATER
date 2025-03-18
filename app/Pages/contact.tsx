@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Linking, StyleSheet, Image } from "react-native";
 import { FontAwesome, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
 import Footer from "@/components/Footer";
 
 const Contact: React.FC = () => {
@@ -55,16 +55,16 @@ const Contact: React.FC = () => {
       {/* Social Icons */}
       <View style={styles.iconContainer}>
         <TouchableOpacity>
-          <Image source={require("../assets/icons/close.png")} style={styles.icon} />
+          <Image source={require("../../assets/icons/close.png")} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Image source={require("../assets/icons/google.png")} style={styles.icon} />
+          <Image source={require("../../assets/icons/google.png")} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Image source={require("../assets/icons/whatsapp.png")} style={styles.icon} />
+          <Image source={require("../../assets/icons/whatsapp.png")} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Image source={require("../assets/icons/linkedin.png")} style={styles.icon} />
+          <Image source={require("../../assets/icons/linkedin.png")} style={styles.icon} />
         </TouchableOpacity>
       </View>
       <Footer/>

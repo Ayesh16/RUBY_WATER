@@ -56,7 +56,7 @@ const Login: React.FC = () => {
           });
           await AsyncStorage.setItem('user', JSON.stringify({ ...parsedUser, isLoggedIn: true }));
           setTimeout(() => {
-            router.push('/home');
+            router.push('/Pages/home');
           }, 2000);
         } else {
           setErrorMessage('Invalid email or password.');
@@ -92,7 +92,7 @@ const Login: React.FC = () => {
     if (user) {
       const parsedUser = JSON.parse(user);
       if (parsedUser.isLoggedIn) {
-        router.push('/home');
+        router.push('/Pages/home');
       }
     }
   };

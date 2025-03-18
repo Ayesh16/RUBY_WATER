@@ -3,6 +3,7 @@ import { View, Image, StyleSheet, TouchableOpacity, TextInput } from "react-nati
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 
 const Navbar = () => {
   const router = useRouter();
@@ -23,7 +24,15 @@ const Navbar = () => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem("user");
     setIsLoggedIn(false);
-    router.push("/auth/signin");
+    Toast.show({
+      type: "success",
+      text1: "Logged Out",
+      text2: "You have successfully logged out!",
+    });
+    setTimeout(() => {
+      router.push("/auth/signin");
+    }, 2000);
+   
   };
 
   return (
@@ -45,6 +54,7 @@ const Navbar = () => {
           </TouchableOpacity>
         )}
       </View>
+      <Toast />
     </View>
   );
 };

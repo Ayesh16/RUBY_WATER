@@ -11,7 +11,7 @@ const truckModelsData: Record<
   drinking: [
     {
       name: "Volvo FMX Water Tanker",
-      image: require("../assets/images/volvo_fmx.png"),
+      image: require("../../assets/images/volvo_fmx.png"),
       service: "Drinking Water Supply",
       capacity: "10,000 Liters",
       price: "$200 per trip",
@@ -19,7 +19,7 @@ const truckModelsData: Record<
     },
     {
       name: "Tata LPT 3118 Water Tanker",
-      image: require("../assets/images/tata_lpt.png"),
+      image: require("../../assets/images/tata_lpt.png"),
       service: "Drinking Water Supply",
       capacity: "8,000 Liters",
       price: "$180 per trip",
@@ -27,7 +27,7 @@ const truckModelsData: Record<
     },
     {
       name: "Isuzu FVR900 Water Truck",
-      image: require("../assets/images/isuzu_fvr.png"),
+      image: require("../../assets/images/isuzu_fvr.png"),
       service: "Drinking Water Supply",
       capacity: "12,000 Liters",
       price: "$220 per trip",
@@ -37,7 +37,7 @@ const truckModelsData: Record<
   construction: [
     {
       name: "Mercedes-Benz Arocs",
-      image: require("../assets/images/mercedes_arocs.png"),
+      image: require("../../assets/images/mercedes_arocs.png"),
       service: "Construction Water Supply",
       capacity: "15,000 Liters",
       price: "$250 per trip",
@@ -45,7 +45,7 @@ const truckModelsData: Record<
     },
     {
       name: "Scania P410",
-      image: require("../assets/images/scania_p410.png"),
+      image: require("../../assets/images/scania_p410.png"),
       service: "Construction Water Supply",
       capacity: "14,000 Liters",
       price: "$240 per trip",
@@ -53,7 +53,7 @@ const truckModelsData: Record<
     },
     {
       name: "MAN TGS 26.400",
-      image: require("../assets/images/man_tgs.png"),
+      image: require("../../assets/images/man_tgs.png"),
       service: "Construction Water Supply",
       capacity: "16,000 Liters",
       price: "$270 per trip",
@@ -88,7 +88,7 @@ const TruckModel = () => {
             style={styles.truckCard}
             onPress={() =>
               router.push(
-                `/truckDetails?name=${item.name}&service=${item.service}&capacity=${item.capacity}&price=${item.price}&description=${item.description}`
+                `/Pages/truckDetails?name=${item.name}&service=${item.service}&capacity=${item.capacity}&price=${item.price}&description=${item.description}`
               )
             }
           >
