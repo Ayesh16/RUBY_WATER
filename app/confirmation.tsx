@@ -1,12 +1,14 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import Navbar from "@/componets/Navbar";
 
 const Confirmation = () => {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
+        <Navbar/>
       {/* Success Icon */}
       <Image source={require("../assets/images/success.png")} style={styles.successIcon} />
 
@@ -38,13 +40,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F3D6E4",
-    padding: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    
   },
   successIcon: {
     width: 100,
     height: 100,
+    marginTop:"15%",
+    alignSelf:"center"
   },
   title: {
     fontSize: 24,
@@ -63,7 +65,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginVertical: 15,
-    width: "90%",
+    width: "50%",
+    alignSelf:"center"
   },
   label: {
     fontSize: 16,
@@ -81,6 +84,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 8,
     marginTop: 20,
+    alignSelf:"center",
+    width:"50%"
   },
   buttonText: {
     fontSize: 18,

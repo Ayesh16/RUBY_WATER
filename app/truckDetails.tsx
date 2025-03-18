@@ -16,6 +16,12 @@ const truckDetailsData: Record<string, { image: any; details: string; capacity: 
     capacity: "8,000 liters",
     price: "$180",
   },
+  "Isuzu FVR900 Water Truck": {
+    image: require("../assets/images/isuzu_fvr.png"),
+    details: "A lightweight and efficient water supply truck for versatile applications.",
+    capacity: "12,000 liters",
+    price: "$220",
+  },
 };
 
 const TruckDetails = () => {

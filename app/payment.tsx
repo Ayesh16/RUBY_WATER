@@ -90,8 +90,10 @@ const styles = StyleSheet.create({
   infoCard: {
     backgroundColor: "#fff",
     padding: 15,
+    width:"50%",
     borderRadius: 10,
     marginVertical: 10,
+    alignSelf:"center"
   },
   label: {
     fontSize: 16,
@@ -105,6 +107,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginVertical: 10,
+    alignSelf:"center"
   },
   paymentOption: {
     flexDirection: "row",
@@ -113,6 +116,8 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     borderRadius: 8,
+    alignSelf:"center",
+    width:"50%"
   },
   paymentImage: {
     width: 50,
@@ -123,6 +128,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 20,
+    alignSelf:"center"
   },
   currencyIcon: {
     width: 30,
@@ -135,6 +141,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 20,
     alignItems: "center",
+    alignSelf:"center",
+    width:"50%"
   },
   buttonText: {
     fontSize: 18,
