@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import Navbar from "@/componets/Navbar";
+
 
 const truckDetailsData: Record<
   string,
@@ -32,14 +33,24 @@ const TruckDetails = () => {
   const params = useLocalSearchParams();
   const truckName = params.name as string;
   const truck = truckDetailsData[truckName];
+  const router = useRouter();
 
   if (!truck) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Truck Not Found</Text>
+        <TouchableOpacity style={styles.goBackButton} onPress={() => router.back()}>
+          <Text style={styles.buttonText}>Go Back</Text>
+        </TouchableOpacity>
       </View>
     );
   }
+
+  const handleBooking = () => {
+    Alert.alert("Booking Confirmed", `You have booked the ${truckName}.`, [
+      { text: "OK", onPress: () => console.log("Booking confirmed") },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
@@ -58,6 +69,11 @@ const TruckDetails = () => {
           <Text style={styles.value}>{truck.price}</Text>
         </View>
       </View>
+
+      {/* Book Now Button */}
+      <TouchableOpacity style={styles.bookButton} onPress={handleBooking}>
+        <Text style={styles.buttonText}>Book Now</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -66,13 +82,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-  },
+},
   truckImage: {
     width: 250,
     height: 150,
     resizeMode: "contain",
     marginTop: "10%",
-    alignSelf: "center",
+    alignSelf:"center"
   },
   title: {
     fontSize: 24,
@@ -82,6 +98,8 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     alignItems: "center",
+    alignSelf:"center",
+    marginTop: 10,
   },
   details: {
     fontSize: 16,
@@ -90,6 +108,8 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
     paddingVertical: 10,
   },
   label: {
@@ -100,6 +120,27 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 18,
     color: "#555",
+  },
+  bookButton: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    marginTop: 20,
+    alignSelf:"center"
+  },
+  goBackButton: {
+    backgroundColor: "#ccc",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
