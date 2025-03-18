@@ -60,6 +60,58 @@ const truckModelsData: Record<
       description: "Robust water transport vehicle with high-performance pumps.",
     },
   ],
+  agriculture: [
+    {
+      name: "Ashok Leyland U-3518",
+      image: require("../../assets/images/ashok_leyland.png"),
+      service: "Agricultural Water Supply",
+      capacity: "9,000 Liters",
+      price: "$190 per trip",
+      description: "Ideal for irrigation and livestock water supply.",
+    },
+    {
+      name: "Mahindra Blazo X 28",
+      image: require("../../assets/images/mahindra_blazo.png"),
+      service: "Agricultural Water Supply",
+      capacity: "11,000 Liters",
+      price: "$210 per trip",
+      description: "Efficient water transport for farms and greenhouses.",
+    },
+    {
+      name: "Hino 500 Series",
+      image: require("../../assets/images/hino_500.png"),
+      service: "Agricultural Water Supply",
+      capacity: "10,500 Liters",
+      price: "$200 per trip",
+      description: "Reliable water distribution for rural and farming needs.",
+    },
+  ],
+  emergency: [
+    {
+      name: "Iveco Trakker Emergency",
+      image: require("../../assets/images/iveco_trakker.png"),
+      service: "Emergency Water Supply",
+      capacity: "13,000 Liters",
+      price: "$300 per trip",
+      description: "Rapid response water supply for disaster relief and emergencies.",
+    },
+    {
+      name: "Renault Kerax Rapid Response",
+      image: require("../../assets/images/renault_kerax.png"),
+      service: "Emergency Water Supply",
+      capacity: "12,500 Liters",
+      price: "$280 per trip",
+      description: "Fast and reliable water transport for critical situations.",
+    },
+    {
+      name: "Ford Cargo 1833",
+      image: require("../../assets/images/ford_cargo.png"),
+      service: "Emergency Water Supply",
+      capacity: "14,000 Liters",
+      price: "$310 per trip",
+      description: "Equipped for quick deployment in emergency water crises.",
+    },
+  ],
 };
 
 const TruckModel = () => {
