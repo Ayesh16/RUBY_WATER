@@ -24,17 +24,21 @@ const Navbar = () => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem("user");
     setIsLoggedIn(false);
+    
     Toast.show({
       type: "success",
       text1: "Logged Out",
       text2: "You have successfully logged out!",
+      position: "top", // Ensure the position is set
+      visibilityTime: 2000, // Show for 2 seconds
+      autoHide: true,
     });
+  
     setTimeout(() => {
       router.push("/auth/signin");
     }, 2000);
-   
   };
-
+  
   return (
     <View style={styles.navbar}>
       {/* Logo */}
