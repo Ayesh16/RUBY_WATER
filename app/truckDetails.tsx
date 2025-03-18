@@ -77,7 +77,7 @@ const TruckDetails = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F3D6E4",
   },
   truckImage: {
     width: 250,

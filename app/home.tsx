@@ -49,7 +49,7 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#F3D6E4" },
   content: { paddingHorizontal: 15 },
   searchBar: { flexDirection: "row", backgroundColor: "#f7c1e0", borderRadius: 20, padding: 10, alignItems: "center", marginTop: 15 },
   searchIcon: { marginLeft: 10 },

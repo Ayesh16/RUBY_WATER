@@ -72,7 +72,7 @@ const Contact: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FBEFF2",
+    backgroundColor: "#F3D6E4",
     width: '100%',
     flex:1,
   },

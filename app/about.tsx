@@ -24,7 +24,7 @@ const AboutUs: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#F3D6E4",
   },
   tankerImage: {
     width: "100%",
