@@ -75,13 +75,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   logoutButton: {
-    backgroundColor: "red",
+    backgroundColor: "white",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 5,
   },
   logoutText: {
-    color: "white",
+    color: "black",
     fontSize: 16,
     fontWeight: "bold",
   },
