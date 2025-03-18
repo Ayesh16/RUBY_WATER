@@ -40,8 +40,9 @@ const Home = () => {
             </TouchableOpacity>
           ))}
         </View>
-        <Footer/>
+        
       </ScrollView>
+      <Footer/>
     </View>
   );
 };

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, Linking, StyleSheet, Image } from "react-native";
 import { FontAwesome, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import Navbar from "../components/Navbar";
+import Footer from "@/components/Footer";
 
 const Contact: React.FC = () => {
   return (
@@ -66,6 +67,7 @@ const Contact: React.FC = () => {
           <Image source={require("../assets/icons/linkedin.png")} style={styles.icon} />
         </TouchableOpacity>
       </View>
+      <Footer/>
     </View>
   );
 };

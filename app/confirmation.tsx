@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const Confirmation = () => {
   const router = useRouter();
@@ -32,6 +33,7 @@ const Confirmation = () => {
       <TouchableOpacity style={styles.homeButton} onPress={() => router.push("/home")}>
         <Text style={styles.buttonText}>Go to Home</Text>
       </TouchableOpacity>
+      <Footer/>
     </View>
   );
 };

@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Checkbox } from "react-native-paper";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const Payment = () => {
   const params = useLocalSearchParams();
@@ -67,6 +68,7 @@ const Payment = () => {
       <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
         <Text style={styles.buttonText}>Proceed to Pay</Text>
       </TouchableOpacity>
+      <Footer/>
     </View>
   );
 };
@@ -127,7 +129,7 @@ const styles = StyleSheet.create({
   amountContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 10,
     alignSelf:"center"
   },
   currencyIcon: {
