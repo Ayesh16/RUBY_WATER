@@ -104,7 +104,7 @@ export default function SignUp() {
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        
             <View style={styles.formContainer}>
               <Text style={styles.title}>Register</Text>
               
@@ -190,7 +190,7 @@ export default function SignUp() {
                         </Text>
               </View>
             </View>
-          </ScrollView>
+          
         </KeyboardAvoidingView>
       </View>
     </ImageBackground>
