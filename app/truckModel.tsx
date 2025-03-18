@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import Navbar from "@/componets/Navbar";
 
 const truckModelsData: Record<string, { name: string; image: any }[]> = {
   drinking: [
@@ -40,6 +41,7 @@ const TruckModel = () => {
 
   return (
     <View style={styles.container}>
+        <Navbar/>
       <Text style={styles.title}>Truck Models for {selectedCategory} Water Supply</Text>
       <FlatList
         data={truckModelsData[selectedCategory]}
@@ -59,9 +61,9 @@ const TruckModel = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff", alignItems: "center" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 15, textTransform: "capitalize" },
-  truckCard: { backgroundColor: "#f9f9f9", padding: 15, borderRadius: 10, alignItems: "center", marginBottom: 15, width: 250 },
+  container: { flex: 1, backgroundColor: "#fff" },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 15, textTransform: "capitalize" , alignSelf:"center" },
+  truckCard: { backgroundColor: "#f9f9f9", padding: 15, borderRadius: 10, alignItems: "center", marginBottom: 15, width: 250, alignSelf:"center" },
   truckImage: { width: 200, height: 120, resizeMode: "contain" },
   model: { fontSize: 18, paddingTop: 10, fontWeight: "500", textAlign: "center" },
 });

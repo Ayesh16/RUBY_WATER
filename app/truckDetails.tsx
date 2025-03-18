@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { useLocalSearchParams } from "expo-router";
+import Navbar from "@/componets/Navbar";
 
 const truckDetailsData: Record<string, { image: any; details: string }> = {
   "Volvo FMX Water Tanker": {
@@ -33,6 +34,7 @@ const TruckDetails = () => {
 
   return (
     <View style={styles.container}>
+        <Navbar/>
       <Image source={truck.image} style={styles.truckImage} />
       <Text style={styles.title}>{truckName}</Text>
       <Text style={styles.details}>{truck.details}</Text>
@@ -41,8 +43,8 @@ const TruckDetails = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, alignItems: "center", backgroundColor: "#fff" },
-  truckImage: { width: 250, height: 150, resizeMode: "contain", marginBottom: 20 },
+  container: { flex: 1, backgroundColor: "#fff"  },
+  truckImage: { width: 250, height: 150, resizeMode: "contain", marginBottom:20, marginTop:"10%" , alignSelf :"center" },
   title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
   details: { fontSize: 16, textAlign: "center", color: "#666" },
 });
