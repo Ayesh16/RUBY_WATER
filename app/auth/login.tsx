@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  ImageBackground, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  ActivityIndicator 
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
@@ -66,114 +65,90 @@ const Login: React.FC = () => {
   };
 
   return (
-    <ImageBackground 
-      source={require('../../assets/images/background.png')} 
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.overlay}>
-        <Text style={styles.title}>Login</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Login</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
 
-        {loading ? (
-          <ActivityIndicator size="large" color="#4CAF50" />
-        ) : (
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-        )}
+      {loading ? (
+        <ActivityIndicator size="large" color="#4CAF50" />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      )}
 
-        <View style={styles.signupLinkContainer}>
-          <Text style={styles.signupLink} onPress={() => router.push('/auth/signup')}>
-            New User? Register
-          </Text>
-        </View>
+      <View style={styles.signupLinkContainer}>
+        <Text>New User?</Text>
+        <TouchableOpacity onPress={() => router.push('/auth/signup')}>
+          <Text style={styles.signupLink}> Register</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Toast Notification */}
       <Toast />
-    </ImageBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
-  overlay: {
+  container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: "rgba(0,0,0,0.2)",
+    padding: 20,
+    backgroundColor: '#fff', // White background like Signup
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 30,
-    color: 'white',
+    marginBottom: 20,
     textAlign: 'center',
-  },
-  inputContainer: {
-    marginBottom: 15,
-    width: 300,
-    height: 50,
   },
   input: {
     height: 50,
-    borderColor: '#fff',
+    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
-    paddingHorizontal: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    paddingLeft: 10,
+    marginBottom: 10,
+    backgroundColor: '#F9F9F9',
   },
   button: {
     backgroundColor: '#4CAF50',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 20,
-    width: 300,
+    marginTop: 10,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   signupLinkContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 15,
   },
   signupLink: {
-    color: 'white',
+    color: '#007BFF',
+    fontWeight: 'bold',
     textDecorationLine: 'underline',
-    fontSize: 16,
   },
 });
 

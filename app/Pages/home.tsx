@@ -1,10 +1,8 @@
-import React from "react"; 
-import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from "expo-router"; // Import useRouter
+import React, { useState } from "react"; 
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { useRouter } from "expo-router"; 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
 
 const categories = [
   { id: 1, name: "drinking", label: "Drinking Water Delivery", image: require("../../assets/images/Drinking.png") },
@@ -14,35 +12,44 @@ const categories = [
 ];
 
 const Home = () => {
-  const router = useRouter(); // Initialize router
+  const router = useRouter(); 
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Simulated login state
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    router.push("/auth/login");
+  };
 
   return (
     <View style={styles.container}>
-      <Navbar />
+      {/* Updated Navbar with Props */}
+      <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
 
       <ScrollView style={styles.content}>
-
+        {/* Banner Section */}
         <View style={styles.banner}>
           <Image source={require("../../assets/images/banner.png")} style={styles.bannerImage} />
           <Text style={styles.welcomeText}>Welcome to Water Supply Services</Text>
         </View>
 
+        {/* Categories */}
         <Text style={styles.categoryTitle}>Categories</Text>
         <View style={styles.categoryGrid}>
           {categories.map((category) => (
             <TouchableOpacity 
               key={category.id} 
               style={styles.categoryCard}
-              onPress={() => router.push(`/Pages/truckModel?category=${category.name}`)} // FIXED: Passing category name
+              onPress={() => router.push(`/Pages/truckModel?category=${category.name}`)}
             >
               <Image source={category.image} style={styles.categoryImage} />
               <Text style={styles.categoryText}>{category.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
-        
       </ScrollView>
-      <Footer/>
+
+      {/* Footer */}
+      <Footer />
     </View>
   );
 };

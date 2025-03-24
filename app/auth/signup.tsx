@@ -16,7 +16,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 
-const API_URL = ' https://5778-27-62-98-154.ngrok-free.app/auth/signup'.trim();
+const API_URL = 'https://5778-27-62-98-154.ngrok-free.app/auth/signup'.trim();
 
 // ✅ Validation Schema
 const schema = yup.object({
@@ -142,6 +142,14 @@ export default function SignUp() {
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
         )}
+
+        {/* ✅ Already a User? Login */}
+        <View style={styles.loginLinkContainer}>
+          <Text>Already a user?</Text>
+          <TouchableOpacity onPress={() => router.push('/auth/login')}>
+            <Text style={styles.loginLink}> Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -157,5 +165,15 @@ const styles = StyleSheet.create({
   toggleButton: { backgroundColor: '#007BFF', padding: 10, borderRadius: 5, alignItems: 'center', marginBottom: 10 },
   toggleButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   errorText: { color: 'red', fontSize: 14, marginBottom: 5 },
+  loginLinkContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 15,
+  },
+  loginLink: {
+    color: '#007BFF',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+  },
 });
 

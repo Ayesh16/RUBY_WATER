@@ -1,63 +1,58 @@
-import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import React from "react";
+import { View, Image, StyleSheet, TouchableOpacity, TextInput, Text } from "react-native";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 
-const Navbar = () => {
+interface NavbarProps {
+  isLoggedIn: boolean;
+  onLogout: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    checkLoginStatus();
-  }, []);
+  const handleLogout = () => {
+    onLogout();
 
-  const checkLoginStatus = async () => {
-    const user = await AsyncStorage.getItem("user");
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      setIsLoggedIn(parsedUser.isLoggedIn);
-    }
-  };
-
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem("user");
-    setIsLoggedIn(false);
-    
     Toast.show({
       type: "success",
       text1: "Logged Out",
       text2: "You have successfully logged out!",
-      position: "top", // Ensure the position is set
-      visibilityTime: 2000, // Show for 2 seconds
+      position: "top",
+      visibilityTime: 2000,
       autoHide: true,
     });
-  
+
     setTimeout(() => {
-      router.push("/auth/signin");
+      router.push("/auth/login");
     }, 2000);
   };
-  
+
   return (
     <View style={styles.navbar}>
       {/* Logo */}
       <Image source={require("../assets/images/logo.png")} style={styles.logo} />
 
+      {/* Search Bar */}
       <View style={styles.searchBar}>
-          <FontAwesome name="search" size={20} color="black" style={styles.searchIcon} />
-          <TextInput placeholder="Search..." style={styles.searchInput} />
-        </View>
+        <FontAwesome name="search" size={20} color="black" style={styles.searchIcon} />
+        <TextInput placeholder="Search..." style={styles.searchInput} />
+      </View>
 
-      {/* User Icon & Logout Button */}
+      {/* User Section */}
       <View style={styles.userSection}>
         <MaterialIcons name="account-circle" size={30} color="white" />
+        
+        {/* Logout Button */}
         {isLoggedIn && (
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <MaterialIcons name="logout" size={18} color="black" />
+            <MaterialIcons name="logout" size={18} color="white" />
+            <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
         )}
       </View>
+      
       <Toast />
     </View>
   );
@@ -82,13 +77,33 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   logoutButton: {
-    backgroundColor: "white",
-    padding: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#d9534f",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 5,
   },
-  searchBar: { flexDirection: "row", backgroundColor: "#f7c1e0", borderRadius: 20, padding: 10, alignItems: "center", marginTop: 15 },
-  searchIcon: { marginLeft: 10 },
-  searchInput: { marginLeft: 10  },
+  logoutText: {
+    color: "white",
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  searchBar: {
+    flexDirection: "row",
+    backgroundColor: "#f7c1e0",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+    width: 200,
+  },
+  searchIcon: {
+    marginLeft: 10,
+  },
+  searchInput: {
+    marginLeft: 10,
+    flex: 1,
+  },
 });
 
 export default Navbar;
