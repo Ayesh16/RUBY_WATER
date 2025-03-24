@@ -1,4 +1,3 @@
-import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
@@ -6,7 +5,9 @@ import { View, Text, Image, StyleSheet } from "react-native";
 const AboutUs: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Navbar/>
+      <Navbar isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } }/>
       <Image source={require("../../assets/images/tanker.png")} style={styles.tankerImage} />
       
       <Text style={styles.heading}>About us</Text>
@@ -18,7 +19,6 @@ const AboutUs: React.FC = () => {
         <Image source={require("../../assets/images/24-7-support.png")} style={styles.gridImage} />
         <Image source={require("../../assets/images/affordable.png")} style={styles.gridImage} />
       </View>
-      <Footer/>
     </View>
   );
 };

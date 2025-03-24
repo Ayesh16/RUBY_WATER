@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 
 const truckModelsData: Record<
   string,
@@ -129,7 +129,9 @@ const TruckModel = () => {
 
   return (
     <View style={styles.container}>
-      <Navbar />
+      <Navbar isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
       <Text style={styles.title}>Truck Models for {selectedCategory} Water Supply</Text>
       <FlatList
         data={truckModelsData[selectedCategory]}
@@ -153,7 +155,6 @@ const TruckModel = () => {
           </TouchableOpacity>
         )}
       />
-      <Footer/>
     </View>
   );
 };

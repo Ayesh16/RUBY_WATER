@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 
 const truckDetailsData: Record<string, { image: any; details: string; capacity: string; price: string }> = {
   "Volvo FMX Water Tanker": {
@@ -59,7 +59,9 @@ const TruckDetails = () => {
 
   return (
     <View style={styles.container}>
-      <Navbar />
+      <Navbar isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
       <Image source={truck.image} style={styles.truckImage} />
       <Text style={styles.title}>{truckName}</Text>
 
@@ -97,7 +99,6 @@ const TruckDetails = () => {
           <Text style={styles.buttonText}>Proceed to Payment</Text>
         </TouchableOpacity>
       </View>
-      <Footer/>
     </View>
   );
 };

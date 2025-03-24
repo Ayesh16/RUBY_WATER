@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router"; 
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 
 const categories = [
   { id: 1, name: "drinking", label: "Drinking Water Delivery", image: require("../../assets/images/Drinking.png") },
@@ -48,8 +48,6 @@ const Home = () => {
         </View>
       </ScrollView>
 
-      {/* Footer */}
-      <Footer />
     </View>
   );
 };

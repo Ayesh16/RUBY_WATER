@@ -2,12 +2,14 @@ import React from "react";
 import { View, Text, TouchableOpacity, Linking, StyleSheet, Image } from "react-native";
 import { FontAwesome, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import Navbar from "../../components/Navbar";
-import Footer from "@/components/Footer";
+
 
 const Contact: React.FC = () => {
   return (
     <View style={styles.container}>
-        <Navbar/>
+        <Navbar isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } }/>
       {/* Address */}
       <View style={styles.row}>
         <Entypo name="location-pin" size={20} color="red" />
@@ -67,7 +69,7 @@ const Contact: React.FC = () => {
           <Image source={require("../../assets/icons/linkedin.png")} style={styles.icon} />
         </TouchableOpacity>
       </View>
-      <Footer/>
+     
     </View>
   );
 };

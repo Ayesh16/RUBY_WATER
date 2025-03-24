@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Checkbox } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 
 const Payment = () => {
   const params = useLocalSearchParams();
@@ -33,7 +33,9 @@ const Payment = () => {
 
   return (
     <View style={styles.container}>
-        <Navbar/>
+        <Navbar isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } }/>
       {/* Header */}
       <Text style={styles.title}>Payment</Text>
 
@@ -72,7 +74,7 @@ const Payment = () => {
         <Text style={styles.buttonText}>Proceed to Pay</Text>
       </TouchableOpacity>
       <Toast />
-      <Footer/>
+    
     </View>
   );
 };

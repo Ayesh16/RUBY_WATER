@@ -51,7 +51,7 @@ const Login: React.FC = () => {
       });
 
       setTimeout(() => {
-        router.push('/Pages/home'); // Redirect to Home page
+        router.push('/home'); // Redirect to Home page
       }, 2000);
     } catch (error: any) {
       Toast.show({
