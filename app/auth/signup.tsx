@@ -7,167 +7,155 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ImageBackground,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import BouncyCheckbox from 'react-native-bouncy-checkbox'; 
 import { useNavigation, useRouter } from 'expo-router';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Toast from 'react-native-toast-message';
+import axios from 'axios';
 
-interface SignUpFormData {
-  name: string;
-  mobile: string;
-  address: string;
-  email: string;
-  pincode: string;
-  location: string;
-  password: string;
-  role: "user" | "admin"; 
-  truck_OwnerName?: string;
-  truck_Id?: string;
-  truck_Capacity?: string;
-  truck_Type?: string;
-}
+const API_URL = ' https://5778-27-62-98-154.ngrok-free.app/auth/signup'.trim();
 
+// ✅ Validation Schema
 const schema = yup.object({
   name: yup.string().required('Customer name is required'),
-  mobile: yup.string().matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits').required('Mobile number is required'),
-  address: yup.string().required('Address is required'),
   email: yup.string().email('Invalid email format').required('Email is required'),
-  pincode: yup.string().matches(/^[0-9]{6}$/, 'PIN Code must be 6 digits').required('PIN Code is required'),
-  location: yup.string().required('Location is required'),
-  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
-  role: yup.mixed<'user' | 'admin'>().oneOf(['user', 'admin']).required('Role is required'),
-  
-  truck_OwnerName: yup.string().when('role', {
-    is: "admin",
-    then: (schema) => schema.required('Truck Owner Name is required'),
+  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  role: yup.string().oneOf(['user', 'admin', 'provider']).required('Role is required'),
+  owner_id: yup.string().when('role', {
+    is: 'provider',
+    then: (schema) => schema.required('Owner ID is required'),
   }),
-  truck_Id: yup.string().when('role', {
-    is: "admin",
-    then: (schema) => schema.required('Truck ID is required'),
+  truck_name: yup.string().when('role', {
+    is: 'provider',
+    then: (schema) => schema.required('Truck name is required'),
   }),
-  truck_Capacity: yup.string().when('role', {
-    is: "admin",
-    then: (schema) => schema.required('Truck Capacity is required'),
+  capacity: yup.string().when('role', {
+    is: 'provider',
+    then: (schema) => schema.required('Truck capacity is required'),
   }),
-  truck_Type: yup.string().when('role', {
-    is: "admin",
-    then: (schema) => schema.required('Truck Type is required'),
+  truck_type: yup.string().when('role', {
+    is: 'provider',
+    then: (schema) => schema.required('Truck type is required'),
+  }),
+  location: yup.string().when('role', {
+    is: 'provider',
+    then: (schema) => schema.required('Location is required'),
   }),
 });
 
 export default function SignUp() {
   const navigation = useNavigation();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<SignUpFormData>({
+  const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      role: 'user', 
-    },
+    defaultValues: { role: 'user' },
   });
+
+  const role = useWatch({ control, name: 'role' });
+  const isProvider = role === 'provider';
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, []);
 
-  const onSubmit = async (data: SignUpFormData) => {
+  // ✅ Handle Form Submission
+  const onSubmit = async (data: any) => {
+    setIsLoading(true);
     try {
-      await AsyncStorage.setItem('user', JSON.stringify(data));
-      Toast.show({
-        type: 'success',
-        text1: 'Registration Successful',
-        text2: 'Your account has been created!',
-      });
-      setTimeout(() => {
-        router.push('/auth/signin');
-      }, 2000);
+      const response = await axios.post(API_URL, data);
+      Alert.alert('Success', 'Signup Successful! Redirecting to login.');
+      router.push('/auth/login');
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Registration Failed',
-        text2: 'An error occurred while creating your account.',
-      });
+      const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message || 'Something went wrong' : 'An unexpected error occurred';
+      Alert.alert('Signup Failed', errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <ImageBackground 
-      source={require('../../assets/images/background.png')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.overlay}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View style={styles.formContainer}>
-            <Text style={styles.title}>Register</Text>
-            {['name', 'email', 'mobile', 'address', 'pincode', 'location', 'password'].map((field) => (
-              <Controller
-                key={field}
-                control={control}
-                name={field as keyof SignUpFormData}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value ?? ''}
-                      secureTextEntry={field === 'password'}
-                    />
-                    {errors[field as keyof SignUpFormData] && (
-                      <Text style={styles.error}>{errors[field as keyof SignUpFormData]?.message}</Text>
-                    )}
-                  </View>
-                )}
-              />
-            ))}
-            <BouncyCheckbox
-              size={25}
-              fillColor="green"
-              text="Register as Admin"
-              isChecked={isAdmin}
-              onPress={(checked: boolean) => {
-                setIsAdmin(checked);
-                setValue('role', checked ? 'admin' : 'user', { shouldValidate: true });
-              }}
-              textStyle={{ textDecorationLine: "none", color: "white", fontSize: 16 }}
-              innerIconStyle={{ borderWidth: 2, borderColor: "white" }}
-              style={{ marginBottom: 10 }}
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Sign Up</Text>
+
+        {/* ✅ User Fields */}
+        {(['name', 'email', 'password'] as const).map((field) => (
+          <View key={field}>
+            <Controller
+              control={control}
+              name={field}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value ?? ''}
+                  secureTextEntry={field === 'password'}
+                />
+              )}
             />
-            <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-              <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
-            <Toast />
+            {errors[field] && <Text style={styles.errorText}>{errors[field]?.message}</Text>}
           </View>
-        </KeyboardAvoidingView>
+        ))}
+
+        {/* ✅ Role Selection */}
+        <TouchableOpacity
+          style={styles.toggleButton}
+          onPress={() => setValue('role', isProvider ? 'user' : 'provider')}
+        >
+          <Text style={styles.toggleButtonText}>
+            {isProvider ? 'Register as User' : 'Register as Provider'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* ✅ Provider Fields */}
+        {isProvider && (['owner_id', 'truck_name', 'capacity', 'truck_type', 'location'] as const).map((field) => (
+          <View key={field}>
+            <Controller
+              control={control}
+              name={field}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder={field.replace('_', ' ').toUpperCase()}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value ?? ''}
+                />
+              )}
+            />
+            {errors[field] && <Text style={styles.errorText}>{errors[field]?.message}</Text>}
+          </View>
+        ))}
+
+        {/* ✅ Loading & Submit */}
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#4CAF50" />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+        )}
       </View>
-    </ImageBackground>
+    </KeyboardAvoidingView>
   );
 }
 
+// ✅ Styles
 const styles = StyleSheet.create({
-  background: { flex: 1, width: '100%', height: '100%' },
-  overlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.2)', justifyContent: 'center', alignItems: 'center' },
-  formContainer: { flex: 1, justifyContent: 'center', padding: 20, width: '100%' },
-  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: 'white' },
-  inputContainer: { marginBottom: 15, height: 50, width: 300 },
-  input: { height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 5, paddingLeft: 10, backgroundColor: '#fff' },
-  error: { color: 'red', fontSize: 12 },
+  container: { flex: 1, justifyContent: 'center', padding: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  input: { height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 5, paddingLeft: 10, marginBottom: 10 },
   button: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 5, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  toggleButton: { backgroundColor: '#007BFF', padding: 10, borderRadius: 5, alignItems: 'center', marginBottom: 10 },
+  toggleButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  errorText: { color: 'red', fontSize: 14, marginBottom: 5 },
 });
+
