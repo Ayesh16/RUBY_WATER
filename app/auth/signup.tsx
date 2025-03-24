@@ -16,7 +16,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 
-const API_URL = 'https://5778-27-62-98-154.ngrok-free.app/auth/signup'.trim();
+const API_URL = 'http://localhost:5000/auth/signup'.trim();
 
 // ✅ Validation Schema
 const schema = yup.object({
