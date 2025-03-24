@@ -24,6 +24,7 @@ const schema = yup.object({
   email: yup.string().email('Invalid email format').required('Email is required'),
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   role: yup.string().oneOf(['user', 'admin', 'provider']).required('Role is required'),
+  checked: yup.boolean(),
   owner_id: yup.string().when('role', {
     is: 'provider',
     then: (schema) => schema.required('Owner ID is required'),
@@ -53,7 +54,7 @@ export default function SignUp() {
 
   const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: { role: 'user' },
+    defaultValues: { role: 'user', checked: false }, // ✅ Initialize checked
   });
 
   const role = useWatch({ control, name: 'role' });
@@ -67,11 +68,18 @@ export default function SignUp() {
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      const response = await axios.post(API_URL, data);
+      const payload = {
+        ...data,
+        checked: data.role === 'provider', // ✅ Ensure checked is correctly set
+      };
+
+      const response = await axios.post(API_URL, payload);
       Alert.alert('Success', 'Signup Successful! Redirecting to login.');
       router.push('/auth/login');
     } catch (error) {
-      const errorMessage = axios.isAxiosError(error) ? error.response?.data?.message || 'Something went wrong' : 'An unexpected error occurred';
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || 'Something went wrong'
+        : 'An unexpected error occurred';
       Alert.alert('Signup Failed', errorMessage);
     } finally {
       setIsLoading(false);
@@ -107,7 +115,11 @@ export default function SignUp() {
         {/* ✅ Role Selection */}
         <TouchableOpacity
           style={styles.toggleButton}
-          onPress={() => setValue('role', isProvider ? 'user' : 'provider')}
+          onPress={() => {
+            const newRole = isProvider ? 'user' : 'provider';
+            setValue('role', newRole);  // ✅ Updates role
+            setValue('checked', newRole === 'provider');  // ✅ Updates checked for backend
+          }}
         >
           <Text style={styles.toggleButtonText}>
             {isProvider ? 'Register as User' : 'Register as Provider'}
@@ -176,4 +188,3 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
-
