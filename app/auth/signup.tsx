@@ -10,21 +10,22 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import Checkbox from 'expo-checkbox'; // ✅ Import Checkbox
 import { useNavigation, useRouter } from 'expo-router';
-import { useForm, Controller, useWatch } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 
 const API_URL = 'https://5778-27-62-98-154.ngrok-free.app/auth/signup'.trim();
+const TRUCK_API_URL = 'https://5778-27-62-98-154.ngrok-free.app/trucks/register'.trim();
 
 // ✅ Validation Schema
 const schema = yup.object({
   name: yup.string().required('Customer name is required'),
   email: yup.string().email('Invalid email format').required('Email is required'),
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-  role: yup.string().oneOf(['user', 'admin', 'provider']).required('Role is required'),
-  checked: yup.boolean(),
+  role: yup.string().oneOf(['user', 'provider']).required('Role is required'),
   owner_id: yup.string().when('role', {
     is: 'provider',
     then: (schema) => schema.required('Owner ID is required'),
@@ -51,30 +52,47 @@ export default function SignUp() {
   const navigation = useNavigation();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(false); // ✅ Track checkbox state
 
   const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: { role: 'user', checked: false }, // ✅ Initialize checked
+    defaultValues: { role: 'user' },
   });
-
-  const role = useWatch({ control, name: 'role' });
-  const isProvider = role === 'provider';
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, []);
 
+  // ✅ When checkbox is toggled, update role
+  const toggleRole = () => {
+    const newRole = !isChecked ? 'provider' : 'user';
+    setIsChecked(!isChecked);
+    setValue('role', newRole); // ✅ Ensure role is updated
+  };
+
   // ✅ Handle Form Submission
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      const payload = {
-        ...data,
-        checked: data.role === 'provider', // ✅ Ensure checked is correctly set
-      };
+      // ✅ 1. Sign up user
+      const response = await axios.post(API_URL, data);
+      Alert.alert('Success', 'Signup Successful!');
 
-      const response = await axios.post(API_URL, payload);
-      Alert.alert('Success', 'Signup Successful! Redirecting to login.');
+      // ✅ 2. If provider, register truck
+      if (data.role === 'provider') {
+        const truckPayload = {
+          owner_id: response.data.userId, // ✅ Corrected Owner ID
+          truck_name: data.truck_name,
+          capacity: data.capacity,
+          truck_type: data.truck_type,
+          location: data.location,
+        };
+
+        await axios.post(TRUCK_API_URL, truckPayload);
+        Alert.alert('Truck Registered', 'Your truck details have been stored.');
+      }
+
+      // ✅ 3. Navigate to Login
       router.push('/auth/login');
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
@@ -112,22 +130,14 @@ export default function SignUp() {
           </View>
         ))}
 
-        {/* ✅ Role Selection */}
-        <TouchableOpacity
-          style={styles.toggleButton}
-          onPress={() => {
-            const newRole = isProvider ? 'user' : 'provider';
-            setValue('role', newRole);  // ✅ Updates role
-            setValue('checked', newRole === 'provider');  // ✅ Updates checked for backend
-          }}
-        >
-          <Text style={styles.toggleButtonText}>
-            {isProvider ? 'Register as User' : 'Register as Provider'}
-          </Text>
-        </TouchableOpacity>
+        {/* ✅ Checkbox for Provider Role */}
+        <View style={styles.checkboxContainer}>
+          <Checkbox value={isChecked} onValueChange={toggleRole} color={isChecked ? "#007BFF" : undefined} />
+          <Text style={styles.checkboxLabel}>Register as a Provider</Text>
+        </View>
 
-        {/* ✅ Provider Fields */}
-        {isProvider && (['owner_id', 'truck_name', 'capacity', 'truck_type', 'location'] as const).map((field) => (
+        {/* ✅ Provider Fields (Only visible when checkbox is checked) */}
+        {isChecked && (['owner_id', 'truck_name', 'capacity', 'truck_type', 'location'] as const).map((field) => (
           <View key={field}>
             <Controller
               control={control}
@@ -168,23 +178,22 @@ export default function SignUp() {
 }
 
 // ✅ Styles
+// ✅ Styles
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 20 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   input: { height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 5, paddingLeft: 10, marginBottom: 10 },
   button: { backgroundColor: '#4CAF50', padding: 15, borderRadius: 5, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  toggleButton: { backgroundColor: '#007BFF', padding: 10, borderRadius: 5, alignItems: 'center', marginBottom: 10 },
-  toggleButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  checkboxContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  checkboxLabel: { marginLeft: 10, fontSize: 16 },
   errorText: { color: 'red', fontSize: 14, marginBottom: 5 },
-  loginLinkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 15,
-  },
-  loginLink: {
-    color: '#007BFF',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-  },
+
+  // ✅ Added missing styles
+  loginLinkContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 15 },
+  loginLink: { color: '#007BFF', fontWeight: 'bold', textDecorationLine: 'underline' },
 });
+
+
+
+
