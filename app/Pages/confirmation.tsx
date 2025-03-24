@@ -32,7 +32,7 @@ const Confirmation = () => {
       </View>
 
       {/* Go Home Button */}
-      <TouchableOpacity style={styles.homeButton} onPress={() => router.push("/Pages/home")}>
+      <TouchableOpacity style={styles.homeButton} onPress={() => router.push("/home")}>
         <Text style={styles.buttonText}>Go to Home</Text>
       </TouchableOpacity>
     
