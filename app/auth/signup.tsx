@@ -17,6 +17,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/auth/signup'.trim();
+const TRUCK_API_URL = 'http://localhost:5000/trucks/register'.trim();
 
 // ✅ Validation Schema
 const schema = yup.object({
@@ -25,10 +26,6 @@ const schema = yup.object({
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   role: yup.string().oneOf(['user', 'admin', 'provider']).required('Role is required'),
   checked: yup.boolean(),
-  owner_id: yup.string().when('role', {
-    is: 'provider',
-    then: (schema) => schema.required('Owner ID is required'),
-  }),
   truck_name: yup.string().when('role', {
     is: 'provider',
     then: (schema) => schema.required('Truck name is required'),
@@ -54,7 +51,7 @@ export default function SignUp() {
 
   const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: { role: 'user', checked: false }, // ✅ Initialize checked
+    defaultValues: { role: 'user', checked: false },
   });
 
   const role = useWatch({ control, name: 'role' });
@@ -69,22 +66,41 @@ export default function SignUp() {
     setIsLoading(true);
     try {
       const payload = {
-        ...data,
-        checked: data.role === 'provider', // ✅ Ensure checked is correctly set
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        checked: data.role === 'provider',
+        truckDetails: data.role === 'provider' ? {
+          owner_id: "", // Backend will assign this
+          truck_name: data.truck_name,
+          capacity: data.capacity,
+          truck_type: data.truck_type,
+          location: data.location,
+        } : undefined,
       };
-
+  
+      console.log("🚀 Sending Payload:", JSON.stringify(payload, null, 2));
+  
       const response = await axios.post(API_URL, payload);
-      Alert.alert('Success', 'Signup Successful! Redirecting to login.');
+      
+      Alert.alert('Success', 'Signup Successful!');
       router.push('/auth/login');
-    } catch (error) {
-      const errorMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message || 'Something went wrong'
-        : 'An unexpected error occurred';
-      Alert.alert('Signup Failed', errorMessage);
+    } catch (error: unknown) {  // ✅ Explicitly set error type to `unknown`
+      if (axios.isAxiosError(error)) {  // ✅ Check if it's an Axios error
+        console.error("❌ Signup Error:", error.response?.data || error.message);
+        Alert.alert('Signup Failed', error.response?.data?.message || 'An error occurred');
+      } else {
+        console.error("❌ Unexpected Error:", error);
+        Alert.alert('Signup Failed', 'An unexpected error occurred');
+      }
     } finally {
       setIsLoading(false);
     }
   };
+  
+  
+  
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -117,8 +133,8 @@ export default function SignUp() {
           style={styles.toggleButton}
           onPress={() => {
             const newRole = isProvider ? 'user' : 'provider';
-            setValue('role', newRole);  // ✅ Updates role
-            setValue('checked', newRole === 'provider');  // ✅ Updates checked for backend
+            setValue('role', newRole);
+            setValue('checked', newRole === 'provider');
           }}
         >
           <Text style={styles.toggleButtonText}>
@@ -127,7 +143,7 @@ export default function SignUp() {
         </TouchableOpacity>
 
         {/* ✅ Provider Fields */}
-        {isProvider && (['owner_id', 'truck_name', 'capacity', 'truck_type', 'location'] as const).map((field) => (
+        {isProvider && (['truck_name', 'capacity', 'truck_type', 'location'] as const).map((field) => (
           <View key={field}>
             <Controller
               control={control}
@@ -177,14 +193,10 @@ const styles = StyleSheet.create({
   toggleButton: { backgroundColor: '#007BFF', padding: 10, borderRadius: 5, alignItems: 'center', marginBottom: 10 },
   toggleButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   errorText: { color: 'red', fontSize: 14, marginBottom: 5 },
-  loginLinkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 15,
-  },
-  loginLink: {
-    color: '#007BFF',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-  },
+  loginLinkContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 15 },
+  loginLink: { color: '#007BFF', fontWeight: 'bold', textDecorationLine: 'underline' },
 });
+
+
+
+
