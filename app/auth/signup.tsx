@@ -48,7 +48,7 @@ export default function SignUp() {
     navigation.setOptions({ headerShown: false });
   }, []);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: { name: any; email: any; password: any; checked: any; truck_name: any; capacity: any; truck_type: any; location: any; category: any; category_description: any; truck_image: any; }) => {
     setIsLoading(true);
     try {
       const payload = {
@@ -151,8 +151,3 @@ const styles = StyleSheet.create({
   buttonText: { color: 'white', textAlign: 'center' },
   errorText: { color: 'red' },
 });
-
-
-
-
-
