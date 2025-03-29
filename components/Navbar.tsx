@@ -47,9 +47,9 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
       {/* User Section */}
       <View style={styles.userSection}>
         {/* Profile Icon - Click to go to Profile Page */}
-        <TouchableOpacity onPress={() => router.push("/profile")}>
+        {/* <TouchableOpacity onPress={() => router.push("/profile")}>
           <MaterialIcons name="account-circle" size={32} color="white" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Logout Button */}
         {isLoggedIn && (

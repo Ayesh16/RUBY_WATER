@@ -21,7 +21,7 @@ const sliderImages = [
   require("../../assets/images/Agri.png"),
 ];
 
-const ProviderHome = () => {
+const Home = () => {
   const router = useRouter(); 
   const [isLoggedIn, setIsLoggedIn] = useState(true); 
 
@@ -127,5 +127,5 @@ const styles = StyleSheet.create({
   offerButtonText: { fontSize: 16, fontWeight: "bold", color: "#333" },
 });
 
-export default ProviderHome;
+export default Home;
 
