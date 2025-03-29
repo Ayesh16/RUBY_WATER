@@ -1,5 +1,7 @@
 import React from "react";
-import { View, Image, StyleSheet, TouchableOpacity, TextInput, Text } from "react-native";
+import { 
+  View, Image, StyleSheet, TouchableOpacity, TextInput, Text 
+} from "react-native";
 import { useRouter } from "expo-router";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
@@ -31,28 +33,33 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
 
   return (
     <View style={styles.navbar}>
-      {/* Logo */}
-      <Image source={require("../assets/images/logo.png")} style={styles.logo} />
+      {/* Logo - Click to go Home */}
+      <TouchableOpacity onPress={() => router.push("/")}>
+        <Image source={require("../assets/images/logo.png")} style={styles.logo} />
+      </TouchableOpacity>
 
       {/* Search Bar */}
       <View style={styles.searchBar}>
-        <FontAwesome name="search" size={20} color="black" style={styles.searchIcon} />
-        <TextInput placeholder="Search..." style={styles.searchInput} />
+        <FontAwesome name="search" size={20} color="gray" style={styles.searchIcon} />
+        <TextInput placeholder="Search products..." style={styles.searchInput} />
       </View>
 
       {/* User Section */}
       <View style={styles.userSection}>
-        <MaterialIcons name="account-circle" size={30} color="white" />
-        
+        {/* Profile Icon - Click to go to Profile Page */}
+        <TouchableOpacity onPress={() => router.push("/profile")}>
+          <MaterialIcons name="account-circle" size={32} color="white" />
+        </TouchableOpacity>
+
         {/* Logout Button */}
         {isLoggedIn && (
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <MaterialIcons name="logout" size={18} color="white" />
+            <MaterialIcons name="logout" size={20} color="white" />
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
         )}
       </View>
-      
+
       <Toast />
     </View>
   );
@@ -60,49 +67,62 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
 
 const styles = StyleSheet.create({
   navbar: {
-    backgroundColor: "#800080",
+    backgroundColor: "#4B0082", // Deep Purple for premium feel
     paddingVertical: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6, // Elevation for Android shadow
   },
   logo: {
-    width: 40,
-    height: 40,
+    width: 45,
+    height: 45,
+    resizeMode: "contain",
   },
   userSection: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
   },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#d9534f",
+    backgroundColor: "#FF5733",
     paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
+    paddingHorizontal: 14,
+    borderRadius: 8,
   },
   logoutText: {
     color: "white",
     fontSize: 16,
     marginLeft: 5,
+    fontWeight: "600",
   },
   searchBar: {
     flexDirection: "row",
-    backgroundColor: "#f7c1e0",
-    borderRadius: 20,
-    padding: 10,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 30,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     alignItems: "center",
-    width: 200,
+    width: 220,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4, // Smooth shadow for Android
   },
   searchIcon: {
-    marginLeft: 10,
+    marginRight: 8,
   },
   searchInput: {
-    marginLeft: 10,
     flex: 1,
+    fontSize: 16,
   },
 });
 
