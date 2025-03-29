@@ -7,11 +7,9 @@ import Navbar from "@/components/Navbar";
 const categories = [
   { id: 1, name: "drinking", label: "Drinking Water Delivery", image: require("../../assets/images/Drinking.png") },
   { id: 2, name: "construction", label: "Construction Water Supply", image: require("../../assets/images/Construction.png") },
-  { id: 3, name: "agriculture", label: "Agricultural Water Trucks", image: require("../../assets/images/Agri.png") },
-  { id: 4, name: "emergency", label: "Emergency Water Supply", image: require("../../assets/images/Emergency.png") },
 ];
 
-const Home = () => {
+const ProviderHome = () => {
   const router = useRouter(); 
   const [isLoggedIn, setIsLoggedIn] = useState(true); // Simulated login state
 
@@ -65,4 +63,4 @@ const styles = StyleSheet.create({
   categoryText: { fontSize: 14, fontWeight: "500", textAlign: "center", marginTop: 5 },
 });
 
-export default Home;
+export default ProviderHome;

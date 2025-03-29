@@ -28,30 +28,35 @@ const Login: React.FC = () => {
       });
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || 'Invalid credentials');
       }
-
+  
       Toast.show({
         type: 'success',
         text1: 'Login Successful',
-        text2: 'Welcome back!',
+        text2: `Welcome back, ${data.name || 'User'}!`,
       });
-
+  
+      // ✅ Check role and navigate accordingly
       setTimeout(() => {
-        router.push('/home'); // Redirect to Home page
+        if (data.role === 'provider') {
+          router.push('/providerhome'); // Navigate to provider's home page
+        } else {
+          router.push('/home'); // Navigate to user's home page
+        }
       }, 2000);
     } catch (error: any) {
       Toast.show({
@@ -62,7 +67,8 @@ const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
+  
 
   return (
     <View style={styles.container}>
