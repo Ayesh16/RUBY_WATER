@@ -147,9 +147,13 @@ export default function SignUp() {
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
         )}
-         <TouchableOpacity onPress={() => router.push("/auth/login")}>
-          <Text style={styles.loginText}>Already a user? Login</Text>
-        </TouchableOpacity>
+          <View style={styles.loginLinkContainer}>
+                 <Text>Already an User?</Text>
+                 <TouchableOpacity onPress={() => router.push('/auth/login')}>
+                   <Text style={styles.loginLink}> Login</Text>
+                 </TouchableOpacity>
+               </View>
+         
       </View>
     </KeyboardAvoidingView>
   );
@@ -159,11 +163,21 @@ const styles = StyleSheet.create({
   container: { padding: 20 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   input: { borderWidth: 1, padding: 10, marginBottom: 10 },
-  toggleButton: { marginVertical: 10, backgroundColor: "#ddd", padding: 10 },
+  toggleButton: { marginVertical: 10, backgroundColor: "powderblue", padding: 10 },
   toggleButtonText: { textAlign: "center" },
   button: { backgroundColor: "blue", padding: 15, borderRadius: 5 },
   buttonText: { color: "white", textAlign: "center" },
   errorText: { color: "red" },
   loginText: { color: "blue", textAlign: "center", marginTop: 10 },
+  loginLinkContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 15,
+  },
+    loginLink: {
+    color: '#007BFF',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+  },
 });
 
