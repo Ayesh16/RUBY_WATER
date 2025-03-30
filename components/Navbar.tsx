@@ -41,7 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
       {/* Search Bar */}
       <View style={styles.searchBar}>
         <FontAwesome name="search" size={20} color="gray" style={styles.searchIcon} />
-        <TextInput placeholder="Search products..." style={styles.searchInput} />
+        <TextInput placeholder="Search Services..." style={styles.searchInput} />
       </View>
 
       {/* User Section */}
@@ -108,9 +108,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 30,
     paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     alignItems: "center",
-    width: 220,
+    width: 230,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
