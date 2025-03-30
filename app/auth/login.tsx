@@ -10,7 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 
-const API_URL = 'https://b458-2401-4900-925e-8a8e-1db1-b735-f3c8-2969.ngrok-free.app/auth/login'; // Replace with actual API
+const API_URL = 'https://647f-2401-4900-4c1b-f348-b84a-4a06-30d9-a39a.ngrok-free.app/auth/login'; // Replace with actual API
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
