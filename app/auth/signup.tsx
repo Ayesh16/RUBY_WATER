@@ -147,6 +147,9 @@ export default function SignUp() {
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
         )}
+         <TouchableOpacity onPress={() => router.push("/auth/login")}>
+          <Text style={styles.loginText}>Already a user? Login</Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -161,5 +164,6 @@ const styles = StyleSheet.create({
   button: { backgroundColor: "blue", padding: 15, borderRadius: 5 },
   buttonText: { color: "white", textAlign: "center" },
   errorText: { color: "red" },
+  loginText: { color: "blue", textAlign: "center", marginTop: 10 },
 });
 
