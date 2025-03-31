@@ -10,7 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 
-const API_URL = 'https://647f-2401-4900-4c1b-f348-b84a-4a06-30d9-a39a.ngrok-free.app/auth/login'; // Replace with actual API
+const API_URL = 'https://bd28-2401-4900-4c1b-f348-b84a-4a06-30d9-a39a.ngrok-free.app/auth/login';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -20,55 +20,53 @@ const Login: React.FC = () => {
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Please fill in all fields.',
-      });
-      return;
-    }
-  
     setLoading(true);
   
     try {
       const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
   
       const data = await response.json();
+      console.log("Full API Response:", data); // ✅ Log full response
   
       if (!response.ok) {
-        throw new Error(data.message || 'Invalid credentials');
+        throw new Error(data.message || "Invalid credentials");
+      }
+  
+      if (!data.role) {
+        console.warn("⚠️ Role is missing in response! API returned:", data); // ✅ Debugging
+        throw new Error("Role is missing in response!");
       }
   
       Toast.show({
-        type: 'success',
-        text1: 'Login Successful',
-        text2: `Welcome back, ${data.name || 'User'}!`,
+        type: "success",
+        text1: "Login Successful",
+        text2: `Welcome back, ${data.name || "User"}!`,
       });
   
-      // ✅ Check role and navigate accordingly
       setTimeout(() => {
-        if (data.role === 'provider') {
-          router.push('/providerhome'); // Navigate to provider's home page
+        if (data.role === "provider") {
+          router.push("/provider/providerhome");
+        } else if (data.role === "user") {
+          router.push("/user/home");
         } else {
-          router.push('/home'); // Navigate to user's home page
+          throw new Error("Unknown role!");
         }
       }, 2000);
     } catch (error: any) {
+      console.error("Login Error:", error.message);
       Toast.show({
-        type: 'error',
-        text1: 'Login Failed',
-        text2: error.message || 'Something went wrong',
+        type: "error",
+        text1: "Login Failed",
+        text2: error.message || "Something went wrong",
       });
     } finally {
       setLoading(false);
     }
   };  
-  
 
   return (
     <View style={styles.container}>
@@ -117,7 +115,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#fff', // White background like Signup
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,

@@ -16,7 +16,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 
-const API_URL = "https://647f-2401-4900-4c1b-f348-b84a-4a06-30d9-a39a.ngrok-free.app/auth/signup".trim();
+const API_URL = "https://bd28-2401-4900-4c1b-f348-b84a-4a06-30d9-a39a.ngrok-free.app/auth/signup".trim();
 
 const schema = yup.object({
   name: yup.string().required("Customer name is required"),
