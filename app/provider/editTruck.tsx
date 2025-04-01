@@ -18,7 +18,7 @@ const EditTruck = () => {
 
   const fetchTruckDetails = async () => {
     try {
-      const response = await axios.get(`https://your-api.com/trucks/${truckId}`);
+      const response = await axios.get(`https://6052-2409-40f4-1004-868e-7432-e9ee-9e6b-e766.ngrok-free.app/trucks/${truckId}`);
       setTruck(response.data);
     } catch (error) {
       console.error("Error fetching truck details:", error);
@@ -27,7 +27,7 @@ const EditTruck = () => {
 
   const handleUpdateTruck = async () => {
     try {
-      await axios.put(`https://bd28-2401-4900-4c1b-f348-b84a-4a06-30d9-a39a.ngrok-free.app/trucks/${truckId}`, truck);
+      await axios.put(`ngrok http --url=fast-bold-herring.ngrok-free.app 80/${truckId}`, truck);
       router.push("/provider/providerhome");
     } catch (error) {
       console.error("Error updating truck:", error);
