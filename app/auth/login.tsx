@@ -51,7 +51,7 @@ const Login: React.FC = () => {
         if (data.role === "provider") {
           router.push("/provider/providerhome");
         } else if (data.role === "user") {
-          router.push("/user/home");
+          router.push("/home");
         } else {
           throw new Error("Unknown role!");
         }
