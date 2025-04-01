@@ -25,7 +25,7 @@ const categories: Record<CategoryType, { label: string; image: any }> = {
   emergency: { label: "Emergency Water Supply", image: require("../../assets/images/Emergency.png") },
 };
 
-const ProviderHome = () => {
+const categoryTruck = () => {
   const router = useRouter();
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -171,4 +171,4 @@ const styles = StyleSheet.create({
   addTruckButtonText: { fontSize: 16, fontWeight: "bold", color: "#fff" },
 });
 
-export default ProviderHome;
+export default categoryTruck;
