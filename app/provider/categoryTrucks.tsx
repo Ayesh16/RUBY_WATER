@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
 
-const API_URL = "https://6052-2409-40f4-1004-868e-7432-e9ee-9e6b-e766.ngrok-free.app";
+const API_URL = "http://localhost:5000";
 
 interface Truck {
   truck_id: string;
@@ -14,15 +14,15 @@ interface Truck {
   capacity?: number;
 }
 
-// ✅ Define the allowed category types
-type CategoryType = "drinking" | "construction" | "agriculture" | "emergency";
+// ✅ Define the allowed category types (using full category labels)
+type CategoryType = "Drinking Water Delivery" | "Construction Water Supply" | "Agricultural Water Trucks" | "Emergency Water Supply";
 
-// ✅ Define the categories with proper typing
+// ✅ Define the categories with full category labels
 const categories: Record<CategoryType, { label: string; image: any }> = {
-  drinking: { label: "Drinking Water Delivery", image: require("../../assets/images/Drinking.png") },
-  construction: { label: "Construction Water Supply", image: require("../../assets/images/Construction.png") },
-  agriculture: { label: "Agricultural Water Trucks", image: require("../../assets/images/Agri.png") },
-  emergency: { label: "Emergency Water Supply", image: require("../../assets/images/Emergency.png") },
+  "Drinking Water Delivery": { label: "Drinking Water Delivery", image: require("../../assets/images/Drinking.png") },
+  "Construction Water Supply": { label: "Construction Water Supply", image: require("../../assets/images/Construction.png") },
+  "Agricultural Water Trucks": { label: "Agricultural Water Trucks", image: require("../../assets/images/Agri.png") },
+  "Emergency Water Supply": { label: "Emergency Water Supply", image: require("../../assets/images/Emergency.png") },
 };
 
 const categoryTruck = () => {
@@ -38,7 +38,7 @@ const categoryTruck = () => {
     try {
       const response = await axios.get(`${API_URL}/trucks/owner/{ownerId}`);
       console.log("API Response:", response.data);
-
+  
       if (Array.isArray(response.data)) {
         setTrucks(response.data);
       } else if (response.data?.trucks && Array.isArray(response.data.trucks)) {
@@ -53,7 +53,7 @@ const categoryTruck = () => {
       setIsLoading(false);
     }
   };
-
+  
   const handleDelete = async (truckId: string) => {
     try {
       await axios.delete(`${API_URL}/trucks/${truckId}`);
@@ -80,7 +80,7 @@ const categoryTruck = () => {
         ) : (
           Object.keys(categories).map((categoryKey) => {
             const category = categories[categoryKey as CategoryType]; // ✅ Ensures type safety
-            const filteredTrucks = trucks.filter((truck) => truck.category === categoryKey);
+            const filteredTrucks = trucks.filter((truck) => truck.category === category.label); // Match category.label instead of categoryKey
 
             return (
               <View key={categoryKey} style={styles.categorySection}>
@@ -121,7 +121,7 @@ const categoryTruck = () => {
                 {/* Add Truck Button for Each Category */}
                 <TouchableOpacity
                   style={styles.addTruckButton}
-                  onPress={() => router.push(`/provider/addTruck?category=${categoryKey}`)}
+                  onPress={() => router.push(`/provider/addTruck?category=${category.label}`)} // Pass the full label
                 >
                   <Text style={styles.addTruckButtonText}>+ Add Truck</Text>
                 </TouchableOpacity>
@@ -172,3 +172,4 @@ const styles = StyleSheet.create({
 });
 
 export default categoryTruck;
+

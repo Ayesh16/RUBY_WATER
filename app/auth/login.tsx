@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://6052-2409-40f4-1004-868e-7432-e9ee-9e6b-e766.ngrok-free.app/auth/login';
+const API_URL = 'http://localhost:5000/auth/login';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -19,6 +20,17 @@ const Login: React.FC = () => {
   
   const router = useRouter();
 
+  // Function to store JWT token in AsyncStorage
+  const storeToken = async (token: string) => {
+    try {
+      await AsyncStorage.setItem('jwtToken', token);
+      console.log('Token stored successfully');
+    } catch (error) {
+      console.error('Error storing the token:', error);
+    }
+  };
+
+  // Handle login
   const handleLogin = async () => {
     setLoading(true);
   
@@ -36,10 +48,12 @@ const Login: React.FC = () => {
         throw new Error(data.message || "Invalid credentials");
       }
   
-      if (!data.role) {
-        console.warn("⚠️ Role is missing in response! API returned:", data); // ✅ Debugging
-        throw new Error("Role is missing in response!");
+      if (!data.token || !data.role) {
+        throw new Error("Token or role missing in response!");
       }
+  
+      // Store JWT token in AsyncStorage
+      await storeToken(data.token);
   
       Toast.show({
         type: "success",
@@ -66,7 +80,7 @@ const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   return (
     <View style={styles.container}>
@@ -104,7 +118,6 @@ const Login: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Toast Notification */}
       <Toast />
     </View>
   );
@@ -157,3 +170,4 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
+

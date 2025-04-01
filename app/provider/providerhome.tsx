@@ -30,7 +30,7 @@ const ProviderHome = () => {
             <TouchableOpacity
               key={category.id}
               style={styles.categoryCard}
-              onPress={() => router.push(`/provider/categoryTrucks?category=${category.id}`)}
+              onPress={() => router.push(`/provider/categoryTrucks?category=${category.label}`)}
             >
               <Image source={category.image} style={styles.categoryImage} />
               <Text style={styles.categoryText}>{category.label}</Text>

@@ -18,7 +18,7 @@ const EditTruck = () => {
 
   const fetchTruckDetails = async () => {
     try {
-      const response = await axios.get(`https://6052-2409-40f4-1004-868e-7432-e9ee-9e6b-e766.ngrok-free.app/trucks/${truckId}`);
+      const response = await axios.get(`http://localhost:5000/trucks/${truckId}`);
       setTruck(response.data);
     } catch (error) {
       console.error("Error fetching truck details:", error);

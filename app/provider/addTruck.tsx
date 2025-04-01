@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import * as Yup from "yup";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Schema for validation using Yup
 const truckSchema = Yup.object().shape({
@@ -30,6 +31,17 @@ const AddTruck = () => {
   const [available, setAvailable] = useState(true); // Added availability
   const [errors, setErrors] = useState<any>({});
 
+  // Function to retrieve JWT token from AsyncStorage
+  const getToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem('jwtToken');
+      return token;
+    } catch (error) {
+      console.error('Error retrieving the token:', error);
+      return null; // Return null if there's an error
+    }
+  };
+
   const handleAddTruck = async () => {
     try {
       // Validate the form using Yup
@@ -47,8 +59,20 @@ const AddTruck = () => {
         { abortEarly: false }
       );
 
+      // Retrieve the JWT token
+      const token = await getToken();
+      console.log("Token:", token); // Check if the token is retrieved
+
+      if (!token) {
+        console.error("No token available");
+        Alert.alert("Session Expired", "Please log in again.");
+        router.push("/auth/login"); // Redirect to login screen
+        return;
+      }
+
+      // Make API request to add truck
       await axios.post(
-        "https://6052-2409-40f4-1004-868e-7432-e9ee-9e6b-e766.ngrok-free.app/trucks/register",
+        "http://localhost:5000/trucks/register",
         {
           owner_id: "123", // Change with actual user ID
           truck_name: truckName,
@@ -63,7 +87,7 @@ const AddTruck = () => {
         {
           headers: {
             "Content-Type": "application/json",  // Ensures proper JSON format
-            Authorization: `Bearer YOUR_JWT_TOKEN_HERE`,  // If authentication is required
+            Authorization: `Bearer ${token}`,  // Pass the JWT token
           },
         }
       );
@@ -76,8 +100,21 @@ const AddTruck = () => {
           return acc;
         }, {});
         setErrors(newErrors);
+      } else if (error instanceof AxiosError) {
+        // Handle Axios errors with specific type
+        if (error.response) {
+          if (error.response.status === 401) {
+            Alert.alert("Unauthorized", "You are not authorized. Please log in again.");
+            router.push("/auth/login");
+          } else {
+            console.error("Error adding truck:", error.response.data);
+            Alert.alert("Error", "There was an issue adding the truck.");
+          }
+        } else {
+          console.error("Axios Error:", error.message);
+        }
       } else {
-        console.error("Error adding truck:", error);
+        console.error("Unexpected error:", error);
       }
     }
   };

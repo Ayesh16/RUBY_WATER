@@ -1,6 +1,6 @@
 import React from "react";
 import { 
-  View, Image, StyleSheet, TouchableOpacity, TextInput, Text 
+  View, Image, StyleSheet, TouchableOpacity, TextInput 
 } from "react-native";
 import { useRouter } from "expo-router";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
@@ -46,20 +46,13 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
 
       {/* User Section */}
       <View style={styles.userSection}>
-        {/* Profile Icon - Click to go to Profile Page */}
-        {/* <TouchableOpacity onPress={() => router.push("/profile")}>
-          <MaterialIcons name="account-circle" size={32} color="white" />
-        </TouchableOpacity> */}
-
         {/* Logout Button */}
         {isLoggedIn && (
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <MaterialIcons name="logout" size={20} color="white" />
-            <Text style={styles.logoutText}>Logout</Text>
+            <MaterialIcons name="logout" size={22} color="black" />
           </TouchableOpacity>
         )}
       </View>
-
       <Toast />
     </View>
   );
@@ -67,7 +60,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
 
 const styles = StyleSheet.create({
   navbar: {
-    backgroundColor: "#4B0082", // Deep Purple for premium feel
+    backgroundColor: "powderblue", // Deep Purple for premium feel
     paddingVertical: 15,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -92,16 +85,10 @@ const styles = StyleSheet.create({
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FF5733",
+    backgroundColor: "white",
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 8,
-  },
-  logoutText: {
-    color: "white",
-    fontSize: 16,
-    marginLeft: 5,
-    fontWeight: "600",
   },
   searchBar: {
     flexDirection: "row",
