@@ -14,13 +14,13 @@ interface Truck {
   truck_id: string;
   truck_name: string;
   truck_image?: string;
-  category_id: string | { _id: string }; // Handle both formats
+  category_id: string | { _id: string };
   capacity?: number;
 }
 
 const CategoryTruck = () => {
   const router = useRouter();
-  const { category_id } = useLocalSearchParams(); // ✅ Getting category_id from params
+  const { category_id } = useLocalSearchParams(); // ✅ Fetching category_id from params
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,7 +36,7 @@ const CategoryTruck = () => {
         return;
       }
 
-      fetchTrucks(ownerId, category_id as string); // ✅ Ensure category_id is passed as string
+      fetchTrucks(ownerId, category_id as string); // ✅ Ensure category_id is used as string
     };
 
     fetchData();
@@ -66,10 +66,6 @@ const CategoryTruck = () => {
           ? truck.category_id._id
           : String(truck.category_id);
 
-        console.log(`🔎 Checking Truck: ${truck.truck_name}`);
-        console.log(`   📌 API Category ID: ${apiCategoryId}`);
-        console.log(`   📌 Given Category ID: ${categoryId}`);
-
         return apiCategoryId.trim() === categoryId.trim();
       });
 
@@ -84,13 +80,16 @@ const CategoryTruck = () => {
     }
   };
 
+  const handleAddTruck = () => {
+    router.push({
+      pathname: "/provider/addTruck",
+      params: { categoryId: category_id }, // ✅ Passing correct category_id
+    });
+  };
+
   const handleDelete = async (truck_id: string) => {
-    console.log(`🗑 Deleting truck: ${truck_id}`);
     Alert.alert("Delete Truck", "Are you sure you want to delete this truck?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
+      { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
         style: "destructive",
@@ -149,12 +148,8 @@ const CategoryTruck = () => {
           ))
         )}
 
-        {/* Add Truck Button (✅ Passing category_id) */}
-        <TouchableOpacity
-          style={styles.addTruckButton}
-          onPress={() => router.push(`/provider/addTruck?category=${category_id}`)}
-        >
-          <Text style={styles.addTruckButtonText}>+ Add Truck</Text>
+        <TouchableOpacity style={styles.addTruckButton} onPress={handleAddTruck}>
+          <Text style={styles.addTruckButtonText}>Add Truck</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
