@@ -40,7 +40,9 @@ export default function SignUp() {
   const navigation = useNavigation();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [categories, setCategories] = useState<{ _id: string; description: string }[]>([]);
+  const [categories, setCategories] = useState<{
+    name: string | undefined; _id: string; description: string 
+}[]>([]);
 
   const {
     control,
@@ -168,7 +170,7 @@ export default function SignUp() {
                   <Picker selectedValue={value} onValueChange={onChange} style={styles.input}>
                     <Picker.Item label="Select a category" value="" />
                     {categories.map((cat) => (
-                      <Picker.Item key={cat._id} label={cat.description} value={cat._id} />
+                      <Picker.Item key={cat._id} label={cat.name} value={cat._id} />
                     ))}
                   </Picker>
                 )}
