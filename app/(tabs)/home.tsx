@@ -1,19 +1,15 @@
-import React, { useState } from "react"; 
+import React, { useEffect, useState } from "react"; 
 import { 
-  View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Dimensions 
+  View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator 
 } from "react-native";
 import { useRouter } from "expo-router"; 
 import Carousel from "react-native-reanimated-carousel";
 import Navbar from "@/components/Navbar";
+import axios from "axios";
 
 const { width } = Dimensions.get("window");
 
-const categories = [
-  { id: 1, name: "drinking", label: "Drinking Water Delivery", image: require("../../assets/images/Drinking.png") },
-  { id: 2, name: "construction", label: "Construction Water Supply", image: require("../../assets/images/Construction.png") },
-  { id: 3, name: "agriculture", label: "Agricultural Water Trucks", image: require("../../assets/images/Agri.png") },
-  { id: 4, name: "emergency", label: "Emergency Water Supply", image: require("../../assets/images/Emergency.png") },
-];
+const API_URL = "http://localhost:5000/categories"; // Replace with actual backend URL
 
 const sliderImages = [
   require("../../assets/images/Drinking.png"),
@@ -24,6 +20,23 @@ const sliderImages = [
 const Home = () => {
   const router = useRouter(); 
   const [isLoggedIn, setIsLoggedIn] = useState(true); 
+  const [categories, setCategories] = useState<{ _id: string; name: string; image: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -40,7 +53,7 @@ const Home = () => {
           <Carousel
             loop
             width={width}
-            height={250}  // Increased height for better view
+            height={250}  
             autoPlay={true}
             autoPlayInterval={3000}
             data={sliderImages}
@@ -58,18 +71,23 @@ const Home = () => {
 
         {/* 🔹 Categories Section */}
         <Text style={styles.categoryTitle}>Choose Your Water Service</Text>
-        <View style={styles.categoryGrid}>
-          {categories.map((category) => (
-            <TouchableOpacity 
-              key={category.id} 
-              style={styles.categoryCard}
-              onPress={() => router.push(`/Pages/truckModel?category=${category.name}`)}
-            >
-              <Image source={category.image} style={styles.categoryImage} />
-              <Text style={styles.categoryText}>{category.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
+        ) : (
+          <View style={styles.categoryGrid}>
+            {categories.map((category) => (
+              <TouchableOpacity 
+                key={category._id} 
+                style={styles.categoryCard}
+                onPress={() => router.push(`/Pages/truckModel?category=${category._id}`)}
+              >
+                <Image source={{ uri: category.image }} style={styles.categoryImage} />
+                <Text style={styles.categoryText}>{category.name}</Text>  {/* ✅ Display category name */}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         {/* 🔹 Special Offers Section */}
         <View style={styles.specialOffer}>
@@ -85,10 +103,8 @@ const Home = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FAFAFA" }, 
-  banner: { alignItems: "center", marginTop: 20, padding: 20,marginHorizontal:20, backgroundColor: "#0080FF", borderRadius: 12 },
+  banner: { alignItems: "center", marginTop: 20, padding: 20, marginHorizontal:20, backgroundColor: "#0080FF", borderRadius: 12 },
   welcomeText: { fontSize: 22, fontWeight: "bold", textAlign: "center", color: "#fff" },
-  ctaButton: { backgroundColor: "#FFD700", paddingVertical: 10, paddingHorizontal: 20, borderRadius: 8, marginTop: 10 },
-  ctaText: { fontSize: 18, fontWeight: "bold", color: "#333" },
   categoryTitle: { fontSize: 22, fontWeight: "700", marginTop: 20, textAlign: "center", color: "#222" },
   categoryGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: 15, paddingHorizontal: 15 },
   categoryCard: { 
@@ -128,4 +144,3 @@ const styles = StyleSheet.create({
 });
 
 export default Home;
-
