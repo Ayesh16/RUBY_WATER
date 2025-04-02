@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -20,17 +20,26 @@ const Login: React.FC = () => {
   
   const router = useRouter();
 
-  // Function to store JWT token in AsyncStorage
-  const storeToken = async (token: string) => {
+  // ✅ Store JWT Token & Owner ID
+  const storeUserDetails = async (token: string, ownerId: string) => {
     try {
-      await AsyncStorage.setItem('jwtToken', token);
-      console.log('Token stored successfully');
+      await AsyncStorage.setItem("authToken", token);  // ✅ Use "authToken" (not "jwtToken")
+      await AsyncStorage.setItem("ownerId", ownerId);
+      console.log("✅ Token and Owner ID stored successfully");
     } catch (error) {
-      console.error('Error storing the token:', error);
+      console.error("❌ Error storing token and owner ID:", error);
     }
+  };  
+  const checkStoredToken = async () => {
+    const token = await AsyncStorage.getItem("authToken");
+    console.log("🔍 Stored Token:", token); // ✅ Debugging: Check if token is stored
   };
-
-  // Handle login
+  
+  useEffect(() => {
+    checkStoredToken(); // Call this in a useEffect in your Home component
+  }, []);
+  
+  
   const handleLogin = async () => {
     setLoading(true);
   
@@ -42,36 +51,33 @@ const Login: React.FC = () => {
       });
   
       const data = await response.json();
-      console.log("Full API Response:", data); // ✅ Log full response
+      console.log("📌 Full API Response:", data); // ✅ Debugging
   
       if (!response.ok) {
         throw new Error(data.message || "Invalid credentials");
       }
   
-      if (!data.token || !data.role) {
-        throw new Error("Token or role missing in response!");
+      if (!data.token || !data.owner_id) {
+        throw new Error("⚠️ Token or Owner ID missing in response!");
       }
   
-      // Store JWT token in AsyncStorage
-      await storeToken(data.token);
+      // ✅ Store Token & Owner ID
+      await storeUserDetails(data.token, data.owner_id);
   
       Toast.show({
         type: "success",
         text1: "Login Successful",
         text2: `Welcome back, ${data.name || "User"}!`,
       });
+
+      // ✅ Debugging: Log User Role
+      console.log("📌 User Role:", data.role);
   
       setTimeout(() => {
-        if (data.role === "provider") {
-          router.push("/provider/providerhome");
-        } else if (data.role === "user") {
-          router.push("/home");
-        } else {
-          throw new Error("Unknown role!");
-        }
+        router.push(data.role === "provider" ? "/provider/providerhome" : "/home");
       }, 2000);
     } catch (error: any) {
-      console.error("Login Error:", error.message);
+      console.error("❌ Login Error:", error.message);
       Toast.show({
         type: "error",
         text1: "Login Failed",
@@ -170,4 +176,3 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
-
