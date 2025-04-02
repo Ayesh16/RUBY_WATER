@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Navbar from "@/components/Navbar";
@@ -11,54 +11,76 @@ interface Truck {
   truck_id: string;
   truck_name: string;
   truck_image?: string;
-  category: string; // Ensure this matches API response
+  category_id: string | { $oid: string }; // Handle both cases
   capacity?: number;
 }
 
-const categoryTruck = () => {
+
+const CategoryTruck = () => {
   const router = useRouter();
+  const { category_id } = useLocalSearchParams(); // ✅ Correctly retrieving category_id
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("🟢 Category ID received from params:", category_id);
       const ownerId = await AsyncStorage.getItem("ownerId");
+
       if (!ownerId) {
         console.error("❌ Owner ID not found!");
         setIsLoading(false);
         return;
       }
-      fetchTrucks(ownerId); // ✅ Ensure the function is called with the correct owner ID
+
+      fetchTrucks(ownerId, category_id as string); // ✅ Ensuring category_id is passed correctly
     };
-  
+
     fetchData();
-  }, []);
-  
-  const fetchTrucks = async (ownerId: string) => {
+  }, [category_id]);
+
+  const fetchTrucks = async (ownerId: string, categoryId: string) => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
         console.error("❌ No authentication token found!");
         return;
       }
-  
-      console.log("🔍 Stored Token:", token);
-  
+
+      console.log("🔍 Fetching trucks for owner:", ownerId);
+      console.log("🔍 Category ID:", categoryId);
+
       const response = await axios.get(`${API_URL}/trucks/owner/${ownerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
-      console.log("✅ API Response:", response.data);
-  
-      // ✅ Ensure correct data extraction
-      if (Array.isArray(response.data)) {
-        setTrucks(response.data); // Directly set the array if response is correct
-      } else if (response.data?.trucks && Array.isArray(response.data.trucks)) {
-        setTrucks(response.data.trucks);
-      } else {
-        console.error("⚠️ Unexpected API response format:", response.data);
-        setTrucks([]);
-      }
+
+      console.log("✅ Full API Response:", response.data);
+
+      // Debugging: Log each truck's category_id
+      const filteredTrucks = response.data.filter((truck: Truck) => {
+        console.log(
+          `🔎 Checking truck: ${truck.truck_name} | API Category ID:`,
+          truck.category_id,
+          " | Type:",
+          typeof truck.category_id
+        );
+      
+        console.log(`🔎 Given Category ID:`, categoryId, " | Type:", typeof categoryId);
+      
+        // ✅ Type assertion to extract _id properly
+        const apiCategoryId =
+          (truck.category_id as unknown as { _id: string })?._id || String(truck.category_id);
+      
+        console.log(`🔍 Extracted API Category ID: ${apiCategoryId}`);
+      
+        return apiCategoryId.trim() === categoryId.trim();
+      });
+      
+      
+
+
+      console.log("🚛 Filtered Trucks:", filteredTrucks);
+      setTrucks(filteredTrucks);
     } catch (error) {
       console.error("❌ Error fetching trucks:", error);
       setTrucks([]);
@@ -66,27 +88,10 @@ const categoryTruck = () => {
       setIsLoading(false);
     }
   };
-  
-  
-  
 
-  const handleDelete = async (truckId: string) => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) {
-        throw new Error("No authentication token found.");
-      }
-  
-      await axios.delete(`${API_URL}/trucks/${truckId}`, {
-        headers: { Authorization: `Bearer ${token}` }, // ✅ Include token
-      });
-  
-      setTrucks((prevTrucks) => prevTrucks.filter((truck) => truck.truck_id !== truckId));
-    } catch (error: any) {
-      console.error("❌ Error deleting truck:", error.response?.data || error.message);
-    }
-  };
-  
+  function handleDelete(truck_id: string): void {
+    console.log(`🗑 Deleting truck: ${truck_id}`);
+  }
 
   return (
     <View style={styles.container}>
@@ -162,4 +167,4 @@ const styles = StyleSheet.create({
   addTruckButtonText: { fontSize: 16, fontWeight: "bold", color: "#fff" },
 });
 
-export default categoryTruck;
+export default CategoryTruck;

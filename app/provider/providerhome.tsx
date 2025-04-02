@@ -44,14 +44,15 @@ const ProviderHome = () => {
         ) : (
           <View style={styles.categoryGrid}>
             {categories.map((category) => (
-              <TouchableOpacity
-                key={category._id}
-                style={styles.categoryCard}
-                onPress={() => router.push(`/provider/categoryTrucks?category=${category._id}`)}
-              >
-                <Image source={{ uri: category.image }} style={styles.categoryImage} />
-                <Text style={styles.categoryText}>{category.name}</Text>  {/* ✅ Display category name */}
-              </TouchableOpacity>
+            <TouchableOpacity
+            key={category._id}
+            style={styles.categoryCard}
+            onPress={() => router.push(`/provider/categoryTrucks?category_id=${category._id}&category_name=${encodeURIComponent(category.name)}`)}
+          >
+            <Image source={{ uri: category.image }} style={styles.categoryImage} />
+            <Text style={styles.categoryText}>{category.name}</Text>  {/* ✅ Display category name */}
+          </TouchableOpacity>
+          
             ))}
           </View>
         )}
