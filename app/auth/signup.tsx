@@ -10,13 +10,16 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import Checkbox from "expo-checkbox"; 
+import { Picker } from "@react-native-picker/picker";
 import { useNavigation, useRouter } from "expo-router";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/auth/signup".trim();
+const API_URL = "http://localhost:5000/auth/signup";
+const CATEGORY_URL = "http://localhost:5000/categories";
 
 const schema = yup.object({
   name: yup.string().required("Customer name is required"),
@@ -27,8 +30,7 @@ const schema = yup.object({
   capacity: yup.number().when("checked", { is: true, then: (schema) => schema.required("Truck capacity is required") }),
   truck_type: yup.string().when("checked", { is: true, then: (schema) => schema.required("Truck type is required") }),
   location: yup.string().when("checked", { is: true, then: (schema) => schema.required("Location is required") }),
-  category: yup.string().when("checked", { is: true, then: (schema) => schema.required("Category is required") }),
-  category_description: yup.string().when("checked", { is: true, then: (schema) => schema.required("Description is required") }),
+  category_id: yup.string().when("checked", { is: true, then: (schema) => schema.required("Category is required") }),
   truck_image: yup.string().when("checked", { is: true, then: (schema) => schema.required("Truck image URL is required") }),
 });
 
@@ -38,47 +40,55 @@ export default function SignUp() {
   const navigation = useNavigation();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState<{ _id: string; description: string }[]>([]);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: { checked: false },
   });
 
   const checked = useWatch({ control, name: "checked" });
+  const selectedCategoryId = watch("category_id");
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(CATEGORY_URL);
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
+      const selectedCategory = categories.find((cat) => cat._id === data.category_id);
       const payload = {
         name: data.name,
         email: data.email,
         password: data.password,
         checked: data.checked,
         role: data.checked ? "provider" : "user",
-        truckDetails: data.checked
-          ? {
-              owner_id: "",
-              truck_name: data.truck_name,
-              capacity: data.capacity,
-              truck_type: data.truck_type,
-              location: data.location,
-              available: true,
-              category: data.category,
-              category_description: data.category_description,
-              truck_image: data.truck_image,
-            }
-          : undefined,
+        ...(data.checked && {  // ✅ Only send truckDetails if checked is true
+          truck_name: data.truck_name,
+          capacity: Number(data.capacity),
+          truck_type: data.truck_type,
+          location: data.location,
+          category_id: data.category_id,
+          truck_image: data.truck_image,
+        }),
       };
-
       console.log("🚀 Sending Payload:", JSON.stringify(payload, null, 2));
       await axios.post(API_URL, payload);
       Alert.alert("Success", "Signup Successful!");
@@ -116,29 +126,57 @@ export default function SignUp() {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.toggleButton} onPress={() => setValue("checked", !checked)}>
-          <Text style={styles.toggleButtonText}>{checked ? "Register as User" : "Register as Provider"}</Text>
-        </TouchableOpacity>
+        {/* ✅ Checkbox for Provider */}
+        <View style={styles.checkboxContainer}>
+          <Checkbox
+            value={checked}
+            onValueChange={(newValue) => setValue("checked", newValue)}
+            color={checked ? "blue" : undefined}
+          />
+          <Text style={styles.checkboxLabel}>Register as Provider</Text>
+        </View>
 
-        {checked &&
-          (["truck_name", "capacity", "truck_type", "location", "category", "category_description", "truck_image"] as const).map((field) => (
-            <View key={field}>
+        {checked && (
+          <>
+            {(["truck_name", "capacity", "truck_type", "location", "truck_image"] as const).map((field) => (
+              <View key={field}>
+                <Controller
+                  control={control}
+                  name={field}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      placeholder={field.replace("_", " ").toUpperCase()}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value?.toString() || ""}
+                      keyboardType={field === "capacity" ? "numeric" : "default"}
+                    />
+                  )}
+                />
+                {errors[field] && <Text style={styles.errorText}>{String(errors[field]?.message)}</Text>}
+              </View>
+            ))}
+
+            {/* ✅ Category Dropdown */}
+            <View>
+              <Text style={styles.label}>Select Category:</Text>
               <Controller
                 control={control}
-                name={field}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder={field.replace("_", " ").toUpperCase()}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value?.toString() || ""}
-                  />
+                name="category_id"
+                render={({ field: { onChange, value } }) => (
+                  <Picker selectedValue={value} onValueChange={onChange} style={styles.input}>
+                    <Picker.Item label="Select a category" value="" />
+                    {categories.map((cat) => (
+                      <Picker.Item key={cat._id} label={cat.description} value={cat._id} />
+                    ))}
+                  </Picker>
                 )}
               />
-              {errors[field] && <Text style={styles.errorText}>{String(errors[field]?.message)}</Text>}
+              {errors.category_id && <Text style={styles.errorText}>{errors.category_id.message}</Text>}
             </View>
-          ))}
+          </>
+        )}
 
         {isLoading ? (
           <ActivityIndicator size="large" color="#4CAF50" />
@@ -147,13 +185,13 @@ export default function SignUp() {
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
         )}
-          <View style={styles.loginLinkContainer}>
-                 <Text>Already an User?</Text>
-                 <TouchableOpacity onPress={() => router.push('/auth/login')}>
-                   <Text style={styles.loginLink}> Login</Text>
-                 </TouchableOpacity>
-               </View>
-         
+
+        <View style={styles.loginLinkContainer}>
+          <Text>Already a user?</Text>
+          <TouchableOpacity onPress={() => router.push("/auth/login")}>
+            <Text style={styles.loginLink}> Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -163,21 +201,13 @@ const styles = StyleSheet.create({
   container: { padding: 20 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   input: { borderWidth: 1, padding: 10, marginBottom: 10 },
-  toggleButton: { marginVertical: 10, backgroundColor: "powderblue", padding: 10 },
-  toggleButtonText: { textAlign: "center" },
+  label: { fontWeight: "bold", marginBottom: 5 },
+  checkboxContainer: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
+  checkboxLabel: { marginLeft: 10, fontSize: 16 },
   button: { backgroundColor: "blue", padding: 15, borderRadius: 5 },
   buttonText: { color: "white", textAlign: "center" },
   errorText: { color: "red" },
-  loginText: { color: "blue", textAlign: "center", marginTop: 10 },
-  loginLinkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 15,
-  },
-    loginLink: {
-    color: '#007BFF',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-  },
+  loginLink: { color: "#007BFF", fontWeight: "bold", textDecorationLine: "underline" },
+  loginLinkContainer: { flexDirection: "row", justifyContent: "center", marginTop: 15 },
 });
 
