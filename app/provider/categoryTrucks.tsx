@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View, Text, ScrollView, TouchableOpacity, Image,
+  StyleSheet, ActivityIndicator, Alert
+} from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -11,14 +14,13 @@ interface Truck {
   truck_id: string;
   truck_name: string;
   truck_image?: string;
-  category_id: string | { $oid: string }; // Handle both cases
+  category_id: string | { _id: string }; // Handle both formats
   capacity?: number;
 }
 
-
 const CategoryTruck = () => {
   const router = useRouter();
-  const { category_id } = useLocalSearchParams(); // ✅ Correctly retrieving category_id
+  const { category_id } = useLocalSearchParams(); // ✅ Getting category_id from params
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,11 +31,12 @@ const CategoryTruck = () => {
 
       if (!ownerId) {
         console.error("❌ Owner ID not found!");
+        Alert.alert("Error", "You need to log in again.");
         setIsLoading(false);
         return;
       }
 
-      fetchTrucks(ownerId, category_id as string); // ✅ Ensuring category_id is passed correctly
+      fetchTrucks(ownerId, category_id as string); // ✅ Ensure category_id is passed as string
     };
 
     fetchData();
@@ -44,6 +47,7 @@ const CategoryTruck = () => {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
         console.error("❌ No authentication token found!");
+        Alert.alert("Error", "Session expired. Please log in again.");
         return;
       }
 
@@ -56,42 +60,62 @@ const CategoryTruck = () => {
 
       console.log("✅ Full API Response:", response.data);
 
-      // Debugging: Log each truck's category_id
+      // Filter trucks by category_id
       const filteredTrucks = response.data.filter((truck: Truck) => {
-        console.log(
-          `🔎 Checking truck: ${truck.truck_name} | API Category ID:`,
-          truck.category_id,
-          " | Type:",
-          typeof truck.category_id
-        );
-      
-        console.log(`🔎 Given Category ID:`, categoryId, " | Type:", typeof categoryId);
-      
-        // ✅ Type assertion to extract _id properly
-        const apiCategoryId =
-          (truck.category_id as unknown as { _id: string })?._id || String(truck.category_id);
-      
-        console.log(`🔍 Extracted API Category ID: ${apiCategoryId}`);
-      
+        const apiCategoryId = typeof truck.category_id === "object" && truck.category_id?._id
+          ? truck.category_id._id
+          : String(truck.category_id);
+
+        console.log(`🔎 Checking Truck: ${truck.truck_name}`);
+        console.log(`   📌 API Category ID: ${apiCategoryId}`);
+        console.log(`   📌 Given Category ID: ${categoryId}`);
+
         return apiCategoryId.trim() === categoryId.trim();
       });
-      
-      
-
 
       console.log("🚛 Filtered Trucks:", filteredTrucks);
       setTrucks(filteredTrucks);
     } catch (error) {
       console.error("❌ Error fetching trucks:", error);
+      Alert.alert("Error", "Failed to fetch trucks.");
       setTrucks([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  function handleDelete(truck_id: string): void {
+  const handleDelete = async (truck_id: string) => {
     console.log(`🗑 Deleting truck: ${truck_id}`);
-  }
+    Alert.alert("Delete Truck", "Are you sure you want to delete this truck?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const token = await AsyncStorage.getItem("authToken");
+            if (!token) {
+              Alert.alert("Error", "Session expired. Please log in again.");
+              return;
+            }
+
+            await axios.delete(`${API_URL}/trucks/delete/${truck_id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            Alert.alert("Success", "Truck deleted successfully.");
+            setTrucks(trucks.filter((truck) => truck.truck_id !== truck_id));
+          } catch (error) {
+            console.error("❌ Error deleting truck:", error);
+            Alert.alert("Error", "Failed to delete truck.");
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
@@ -125,8 +149,11 @@ const CategoryTruck = () => {
           ))
         )}
 
-        {/* Add Truck Button */}
-        <TouchableOpacity style={styles.addTruckButton} onPress={() => router.push("/provider/addTruck")}>
+        {/* Add Truck Button (✅ Passing category_id) */}
+        <TouchableOpacity
+          style={styles.addTruckButton}
+          onPress={() => router.push(`/provider/addTruck?category=${category_id}`)}
+        >
           <Text style={styles.addTruckButtonText}>+ Add Truck</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -157,13 +184,7 @@ const styles = StyleSheet.create({
   editButtonText: { color: "#fff", textAlign: "center" },
   deleteButton: { marginTop: 8, backgroundColor: "#FF3B30", padding: 5, borderRadius: 5 },
   deleteButtonText: { color: "#fff", textAlign: "center" },
-  addTruckButton: {
-    backgroundColor: "#0080FF",
-    padding: 10,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
+  addTruckButton: { backgroundColor: "#0080FF", padding: 10, borderRadius: 8, alignItems: "center", marginTop: 10 },
   addTruckButtonText: { fontSize: 16, fontWeight: "bold", color: "#fff" },
 });
 
