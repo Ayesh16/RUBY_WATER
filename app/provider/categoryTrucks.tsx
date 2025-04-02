@@ -21,41 +21,54 @@ const categoryTruck = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkToken = async () => {
-      const token = await AsyncStorage.getItem("authToken");
-      console.log("🔍 Stored Token:", token); // ✅ Check if token exists
+    const fetchData = async () => {
+      const ownerId = await AsyncStorage.getItem("ownerId");
+      if (!ownerId) {
+        console.error("❌ Owner ID not found!");
+        setIsLoading(false);
+        return;
+      }
+      fetchTrucks(ownerId); // ✅ Ensure the function is called with the correct owner ID
     };
-    checkToken();
+  
+    fetchData();
   }, []);
   
-
   const fetchTrucks = async (ownerId: string) => {
     try {
-      const token = await AsyncStorage.getItem("authToken"); // 🔹 Retrieve token
+      const token = await AsyncStorage.getItem("authToken");
       if (!token) {
-        throw new Error("No authentication token found."); // 🔴 Debugging
+        console.error("❌ No authentication token found!");
+        return;
       }
   
+      console.log("🔍 Stored Token:", token);
+  
       const response = await axios.get(`${API_URL}/trucks/owner/${ownerId}`, {
-        headers: { Authorization: `Bearer ${token}` }, // ✅ Add token in headers
+        headers: { Authorization: `Bearer ${token}` },
       });
   
-      console.log("📌 API Response:", response.data);
+      console.log("✅ API Response:", response.data);
   
+      // ✅ Ensure correct data extraction
       if (Array.isArray(response.data)) {
-        setTrucks(response.data);
+        setTrucks(response.data); // Directly set the array if response is correct
       } else if (response.data?.trucks && Array.isArray(response.data.trucks)) {
         setTrucks(response.data.trucks);
       } else {
+        console.error("⚠️ Unexpected API response format:", response.data);
         setTrucks([]);
       }
-    } catch (error: any) {
-      console.error("❌ Error fetching trucks:", error.response?.data || error.message);
+    } catch (error) {
+      console.error("❌ Error fetching trucks:", error);
       setTrucks([]);
     } finally {
       setIsLoading(false);
     }
   };
+  
+  
+  
 
   const handleDelete = async (truckId: string) => {
     try {
