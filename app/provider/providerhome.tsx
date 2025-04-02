@@ -1,17 +1,30 @@
-import React from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import Navbar from "@/components/Navbar";
+import axios from "axios";
 
-const categories = [
-  { id: "drinking", label: "Drinking Water Delivery", image: require("../../assets/images/Drinking.png") },
-  { id: "construction", label: "Construction Water Supply", image: require("../../assets/images/Construction.png") },
-  { id: "agriculture", label: "Agricultural Water Trucks", image: require("../../assets/images/Agri.png") },
-  { id: "emergency", label: "Emergency Water Supply", image: require("../../assets/images/Emergency.png") },
-];
+const API_URL = "http://localhost:5000/categories"; // Update with actual backend URL
 
 const ProviderHome = () => {
   const router = useRouter();
+  const [categories, setCategories] = useState<{ _id: string; name: string; image: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -25,18 +38,23 @@ const ProviderHome = () => {
 
         {/* Category Section */}
         <Text style={styles.heading}>Choose a Truck Category</Text>
-        <View style={styles.categoryGrid}>
-          {categories.map((category) => (
-            <TouchableOpacity
-              key={category.id}
-              style={styles.categoryCard}
-              onPress={() => router.push(`/provider/categoryTrucks?category=${category.label}`)}
-            >
-              <Image source={category.image} style={styles.categoryImage} />
-              <Text style={styles.categoryText}>{category.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
+        ) : (
+          <View style={styles.categoryGrid}>
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category._id}
+                style={styles.categoryCard}
+                onPress={() => router.push(`/provider/categoryTrucks?category=${category._id}`)}
+              >
+                <Image source={{ uri: category.image }} style={styles.categoryImage} />
+                <Text style={styles.categoryText}>{category.name}</Text>  {/* ✅ Display category name */}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -61,7 +79,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
     borderWidth: 1,
-    borderColor: "#E0E0E0"
+    borderColor: "#E0E0E0",
   },
   categoryImage: { width: 110, height: 110 },
   categoryText: { fontSize: 16, fontWeight: "500", textAlign: "center", marginTop: 5, color: "#333" },
