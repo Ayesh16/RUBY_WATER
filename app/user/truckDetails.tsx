@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { 
+  View, Text, Image, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, ScrollView 
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -7,7 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const API_URL = "http://localhost:5000";
 
 const TruckDetails = () => {
-  const { id } = useLocalSearchParams(); // ✅ Get truck ID from URL
+  const { id } = useLocalSearchParams();
   const [truck, setTruck] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -16,7 +18,6 @@ const TruckDetails = () => {
       Alert.alert("Error", "No truck ID provided.");
       return;
     }
-
     fetchTruckDetails();
   }, [id]);
 
@@ -47,21 +48,62 @@ const TruckDetails = () => {
   if (!truck) return <Text style={styles.errorText}>Truck details not found.</Text>;
 
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: truck.truck_image }} style={styles.truckImage} />
-      <Text style={styles.truckName}>{truck.truck_name}</Text>
-      <Text style={styles.truckCapacity}>Capacity: {truck.capacity ?? "N/A"} Liters</Text>
-      <Text style={styles.truckCategory}>Category: {truck.category_id?.name || "Unknown"}</Text>
-    </View>
+    <ScrollView style={styles.container}>
+      {/* Truck Image */}
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: truck.truck_image }} style={styles.truckImage} />
+      </View>
+
+      {/* Truck Details Card */}
+      <View style={styles.detailsCard}>
+        <Text style={styles.truckName}>{truck.truck_name || "Unknown Truck"}</Text>
+        
+        <Text style={styles.price}>₹{truck.price || "N/A"} <Text style={styles.discount}>₹{truck.original_price || "N/A"}</Text></Text>
+
+        <Text style={styles.truckCapacity}>💧 Capacity: {truck.capacity ?? "N/A"} Liters</Text>
+        <Text style={styles.truckLocation}>📍 Location: {truck.location || "Not Available"}</Text>
+        <Text style={styles.truckType}>🚛 Type: {truck.truck_type || "Unknown"}</Text>
+
+        <Text style={[styles.truckAvailability, { color: truck.available ? "green" : "red" }]}>
+          {truck.available ? "✅ Available" : "❌ Not Available"}
+        </Text>
+
+        {/* Book Now Button */}
+        <TouchableOpacity style={styles.bookButton}>
+          <Text style={styles.bookButtonText}>Book Now</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20, alignItems: "center" },
-  truckImage: { width: "100%", height: 250, borderRadius: 10 },
-  truckName: { fontSize: 22, fontWeight: "bold", marginTop: 10 },
-  truckCapacity: { fontSize: 16, marginTop: 5 },
-  truckCategory: { fontSize: 16, marginTop: 5, color: "#555" },
+  container: { flex: 1, backgroundColor: "#FAFAFA" },
+
+  /* Image Section */
+  imageContainer: { backgroundColor: "#fff", padding: 15, alignItems: "center" },
+  truckImage: { width: "90%", height: 280, borderRadius: 10, resizeMode: "cover" },
+
+  /* Truck Details Card */
+  detailsCard: { 
+    backgroundColor: "#fff", padding: 20, margin: 15, borderRadius: 10, 
+    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.1, shadowRadius: 5, elevation: 5 
+  },
+
+  truckName: { fontSize: 22, fontWeight: "bold", textAlign: "center", color: "#333" },
+  price: { fontSize: 22, fontWeight: "bold", color: "#0080FF", textAlign: "center", marginVertical: 5 },
+  discount: { fontSize: 18, textDecorationLine: "line-through", color: "gray", marginLeft: 5 },
+  
+  truckCapacity: { fontSize: 18, fontWeight: "500", marginTop: 10 },
+  truckLocation: { fontSize: 18, marginTop: 5, color: "#007BFF" },
+  truckType: { fontSize: 18, marginTop: 5, fontWeight: "500" },
+  truckAvailability: { fontSize: 18, marginTop: 5, fontWeight: "bold", textAlign: "center" },
+
+  /* Book Now Button */
+  bookButton: { backgroundColor: "#0080FF", padding: 15, borderRadius: 10, marginTop: 20, alignItems: "center" },
+  bookButtonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
+
   errorText: { fontSize: 16, color: "red", textAlign: "center", marginTop: 20 },
 });
 
