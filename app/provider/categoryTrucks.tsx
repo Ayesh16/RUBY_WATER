@@ -11,7 +11,7 @@ import Navbar from "@/components/Navbar";
 const API_URL = "http://localhost:5000";
 
 interface Truck {
-  truck_id: string;
+  _id: string;  // ✅ Changed from truck_id to _id
   truck_name: string;
   truck_image?: string;
   category_id: string | { _id: string };
@@ -77,17 +77,16 @@ const CategoryTruck = () => {
     router.push({ pathname: "/provider/addTruck", params: { categoryId: category_id } });
   };
 
-const handleEditTruck = (truckId: string) => {
-  console.log("🟢 Edit button pressed for Truck ID:", truckId);
+  const handleEditTruck = (truckId: string) => {
+    console.log("🟢 Edit button pressed for Truck ID:", truckId);
 
-  if (!truckId) {
-    Alert.alert("Error", "Invalid Truck ID. Please try again.");
-    return;
-  }
+    if (!truckId) {
+      Alert.alert("Error", "Invalid Truck ID. Please try again.");
+      return;
+    }
 
-  router.push(`/provider/editTruck?truckId=${truckId}`);
-};
-
+    router.push(`/provider/editTruck?truckId=${truckId}`);
+  };
 
   return (
     <View style={styles.container}>
@@ -102,14 +101,21 @@ const handleEditTruck = (truckId: string) => {
           <Text style={styles.noTruckText}>No trucks available</Text>
         ) : (
           trucks.map((truck) => (
-            <View key={truck.truck_id} style={styles.truckCard}>
+            <View key={truck._id} style={styles.truckCard}>  {/* ✅ Changed truck_id to _id */}
               <Image source={{ uri: truck.truck_image || "https://via.placeholder.com/80" }} style={styles.truckImage} />
               <View style={styles.truckInfo}>
                 <Text style={styles.truckName}>{truck.truck_name || "Unnamed Truck"}</Text>
                 <Text style={styles.truckCapacity}>Capacity: {truck.capacity ?? "N/A"} Liters</Text>
                 <TouchableOpacity
                   style={styles.editButton}
-                  onPress={() => handleEditTruck(truck.truck_id)}
+                  onPress={() => {
+                    console.log("📌 Truck Data:", truck); // Debugging log
+                    if (!truck._id) {
+                      Alert.alert("Error", "Truck ID is missing!");
+                      return;
+                    }
+                    handleEditTruck(truck._id); // ✅ Changed truck_id to _id
+                  }}
                 >
                   <Text style={styles.editButtonText}>Edit</Text>
                 </TouchableOpacity>
