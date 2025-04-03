@@ -11,7 +11,7 @@ import Navbar from "@/components/Navbar";
 const API_URL = "http://localhost:5000";
 
 interface Truck {
-  _id: string;  // ✅ Changed from truck_id to _id
+  _id: string;
   truck_name: string;
   truck_image?: string;
   category_id: string | { _id: string };
@@ -88,6 +88,69 @@ const CategoryTruck = () => {
     router.push(`/provider/editTruck?truckId=${truckId}`);
   };
 
+  const handleDeleteTruck = async (truckId: string) => {
+    console.log(`🚛 Attempting to delete truck: ${truckId}`);
+  
+    Alert.alert("Confirm Deletion", "Are you sure you want to delete this truck?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const token = await AsyncStorage.getItem("authToken");
+            if (!token) {
+              Alert.alert("Error", "Session expired. Please log in again.");
+              return;
+            }
+  
+            const apiUrl = `${API_URL}/trucks/${truckId}`;
+            console.log("🔗 DELETE API URL:", apiUrl);
+  
+            const response = await axios.delete(apiUrl, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+  
+            console.log("✅ Delete Response:", response.status, response.data);
+  
+            if (response.status === 200 || response.data?.success) {
+              Alert.alert("Success", "Truck deleted successfully.");
+  
+              // ✅ Step 1: Log Current Truck List
+              console.log("🚛 BEFORE DELETE - Truck List:", trucks);
+  
+              // ✅ Step 2: Remove from State & Log Updated List
+              setTrucks((prevTrucks) => {
+                const updatedTrucks = prevTrucks.filter((truck) => truck._id !== truckId);
+                console.log("🚛 AFTER DELETE - Updated Truck List:", updatedTrucks);
+                return updatedTrucks;
+              });
+  
+              // ✅ Step 3: Log Before Fetching Again
+              console.log("⏳ Refreshing Truck List from Backend...");
+              
+              setTimeout(async () => {
+                const ownerId = await AsyncStorage.getItem("ownerId");
+                if (!ownerId) {
+                  console.error("❌ Owner ID not found! Cannot refresh truck list.");
+                  return;
+                }
+                await fetchTrucks(ownerId, category_id as string);
+                console.log("✅ Fetched Truck List After Deletion");
+              }, 500); 
+            } else {
+              Alert.alert("Error", "Failed to delete truck.");
+            }
+          } catch (error: any) {
+            console.error("❌ Delete failed:", error?.response?.data || error);
+            Alert.alert("Error", error?.response?.data?.message || "Unknown error occurred");
+          }
+        },
+      },
+    ]);
+  };
+  
+
   return (
     <View style={styles.container}>
       <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
@@ -101,24 +164,19 @@ const CategoryTruck = () => {
           <Text style={styles.noTruckText}>No trucks available</Text>
         ) : (
           trucks.map((truck) => (
-            <View key={truck._id} style={styles.truckCard}>  {/* ✅ Changed truck_id to _id */}
+            <View key={truck._id} style={styles.truckCard}>
               <Image source={{ uri: truck.truck_image || "https://via.placeholder.com/80" }} style={styles.truckImage} />
               <View style={styles.truckInfo}>
                 <Text style={styles.truckName}>{truck.truck_name || "Unnamed Truck"}</Text>
                 <Text style={styles.truckCapacity}>Capacity: {truck.capacity ?? "N/A"} Liters</Text>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => {
-                    console.log("📌 Truck Data:", truck); // Debugging log
-                    if (!truck._id) {
-                      Alert.alert("Error", "Truck ID is missing!");
-                      return;
-                    }
-                    handleEditTruck(truck._id); // ✅ Changed truck_id to _id
-                  }}
-                >
-                  <Text style={styles.editButtonText}>Edit</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.editButton} onPress={() => handleEditTruck(truck._id)}>
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteTruck(truck._id)}>
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           ))
@@ -151,9 +209,10 @@ const styles = StyleSheet.create({
   truckInfo: { flex: 1, marginLeft: 15 },
   truckName: { fontSize: 18, fontWeight: "bold", color: "#333" },
   truckCapacity: { fontSize: 14, color: "#666", marginTop: 3 },
-  editButton: { marginTop: 8, backgroundColor: "#FF9500", padding: 5, borderRadius: 5 },
+  buttonContainer: { flexDirection: "row", marginTop: 10 },
+  editButton: { backgroundColor: "#FF9500", padding: 5, borderRadius: 5, marginRight: 10 },
   editButtonText: { color: "#fff", textAlign: "center" },
-  deleteButton: { marginTop: 8, backgroundColor: "#FF3B30", padding: 5, borderRadius: 5 },
+  deleteButton: { backgroundColor: "#FF3B30", padding: 5, borderRadius: 5 },
   deleteButtonText: { color: "#fff", textAlign: "center" },
   addTruckButton: { backgroundColor: "#0080FF", padding: 10, borderRadius: 8, alignItems: "center", marginTop: 10 },
   addTruckButtonText: { fontSize: 16, fontWeight: "bold", color: "#fff" },
