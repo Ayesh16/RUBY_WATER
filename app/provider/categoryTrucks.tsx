@@ -89,65 +89,34 @@ const CategoryTruck = () => {
   };
 
   const handleDeleteTruck = async (truckId: string) => {
-    console.log(`🚛 Attempting to delete truck: ${truckId}`);
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      
+      if (!token) {
+        Alert.alert("Error", "Session expired. Please log in again.");
+        return;
+      }
   
-    Alert.alert("Confirm Deletion", "Are you sure you want to delete this truck?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const token = await AsyncStorage.getItem("authToken");
-            if (!token) {
-              Alert.alert("Error", "Session expired. Please log in again.");
-              return;
-            }
-  
-            const apiUrl = `${API_URL}/trucks/${truckId}`;
-            console.log("🔗 DELETE API URL:", apiUrl);
-  
-            const response = await axios.delete(apiUrl, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-  
-            console.log("✅ Delete Response:", response.status, response.data);
-  
-            if (response.status === 200 || response.data?.success) {
-              Alert.alert("Success", "Truck deleted successfully.");
-  
-              // ✅ Step 1: Log Current Truck List
-              console.log("🚛 BEFORE DELETE - Truck List:", trucks);
-  
-              // ✅ Step 2: Remove from State & Log Updated List
-              setTrucks((prevTrucks) => {
-                const updatedTrucks = prevTrucks.filter((truck) => truck._id !== truckId);
-                console.log("🚛 AFTER DELETE - Updated Truck List:", updatedTrucks);
-                return updatedTrucks;
-              });
-  
-              // ✅ Step 3: Log Before Fetching Again
-              console.log("⏳ Refreshing Truck List from Backend...");
-              
-              setTimeout(async () => {
-                const ownerId = await AsyncStorage.getItem("ownerId");
-                if (!ownerId) {
-                  console.error("❌ Owner ID not found! Cannot refresh truck list.");
-                  return;
-                }
-                await fetchTrucks(ownerId, category_id as string);
-                console.log("✅ Fetched Truck List After Deletion");
-              }, 500); 
-            } else {
-              Alert.alert("Error", "Failed to delete truck.");
-            }
-          } catch (error: any) {
-            console.error("❌ Delete failed:", error?.response?.data || error);
-            Alert.alert("Error", error?.response?.data?.message || "Unknown error occurred");
-          }
+      const response = await fetch(`${API_URL}/trucks/${truckId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      },
-    ]);
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete truck");
+      }
+  
+      // Remove the deleted truck from the list
+      setTrucks(trucks.filter((truck) => truck._id !== truckId));
+      Alert.alert("Success", "Truck deleted successfully!");
+  
+    } catch (error) {
+      console.error("❌ Error deleting truck:", error);
+      Alert.alert("Error", "Failed to delete the truck.");
+    }
   };
   
 
