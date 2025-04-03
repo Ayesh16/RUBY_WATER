@@ -126,14 +126,15 @@ const Home = () => {
               {trucksByCategory[category._id]?.length > 0 ? (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.truckScroll}>
                   {trucksByCategory[category._id].map((truck) => (
-                    <TouchableOpacity 
-                      key={truck._id} 
-                      style={styles.truckCard}
-                      onPress={() => router.push(`/Pages/truckDetails?id=${truck._id}`)}
-                    >
-                      <Image source={{ uri: truck.truck_image }} style={styles.truckImage} />
-                      <Text style={styles.truckText}>{truck.truck_name}</Text>
-                    </TouchableOpacity>
+                   <TouchableOpacity 
+                   key={truck._id} 
+                   style={styles.truckCard}
+                   onPress={() => router.push({ pathname: "/user/truckDetails", params: { id: truck._id } })}
+                 >
+                   <Image source={{ uri: truck.truck_image }} style={styles.truckImage} />
+                   <Text style={styles.truckText}>{truck.truck_name}</Text>
+                 </TouchableOpacity>
+                 
                   ))}
                 </ScrollView>
               ) : (

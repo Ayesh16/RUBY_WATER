@@ -20,7 +20,7 @@ interface Truck {
 
 const CategoryTruck = () => {
   const router = useRouter();
-  const { category_id } = useLocalSearchParams(); // ✅ Fetching category_id from params
+  const { category_id } = useLocalSearchParams();
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,7 +36,7 @@ const CategoryTruck = () => {
         return;
       }
 
-      fetchTrucks(ownerId, category_id as string); // ✅ Ensure category_id is used as string
+      fetchTrucks(ownerId, category_id as string);
     };
 
     fetchData();
@@ -46,19 +46,14 @@ const CategoryTruck = () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
-        console.error("❌ No authentication token found!");
         Alert.alert("Error", "Session expired. Please log in again.");
         return;
       }
 
       console.log("🔍 Fetching trucks for owner:", ownerId);
-      console.log("🔍 Category ID:", categoryId);
-
       const response = await axios.get(`${API_URL}/trucks/owner/${ownerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      console.log("✅ Full API Response:", response.data);
 
       // Filter trucks by category_id
       const filteredTrucks = response.data.filter((truck: Truck) => {
@@ -69,10 +64,8 @@ const CategoryTruck = () => {
         return apiCategoryId.trim() === categoryId.trim();
       });
 
-      console.log("🚛 Filtered Trucks:", filteredTrucks);
       setTrucks(filteredTrucks);
     } catch (error) {
-      console.error("❌ Error fetching trucks:", error);
       Alert.alert("Error", "Failed to fetch trucks.");
       setTrucks([]);
     } finally {
@@ -81,40 +74,20 @@ const CategoryTruck = () => {
   };
 
   const handleAddTruck = () => {
-    router.push({
-      pathname: "/provider/addTruck",
-      params: { categoryId: category_id }, // ✅ Passing correct category_id
-    });
+    router.push({ pathname: "/provider/addTruck", params: { categoryId: category_id } });
   };
 
-  const handleDelete = async (truck_id: string) => {
-    Alert.alert("Delete Truck", "Are you sure you want to delete this truck?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const token = await AsyncStorage.getItem("authToken");
-            if (!token) {
-              Alert.alert("Error", "Session expired. Please log in again.");
-              return;
-            }
-
-            await axios.delete(`${API_URL}/trucks/delete/${truck_id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-
-            Alert.alert("Success", "Truck deleted successfully.");
-            setTrucks(trucks.filter((truck) => truck.truck_id !== truck_id));
-          } catch (error) {
-            console.error("❌ Error deleting truck:", error);
-            Alert.alert("Error", "Failed to delete truck.");
-          }
-        },
-      },
-    ]);
+  const handleEditTruck = (truckId: string) => {
+    console.log("🟢 Edit button pressed for Truck ID:", truckId);
+  
+    if (!truckId) {
+      Alert.alert("Error", "Invalid Truck ID. Please try again.");
+      return;
+    }
+  
+    router.push(`/provider/editTruck?truckId=${truckId}`);
   };
+  
 
   return (
     <View style={styles.container}>
@@ -135,14 +108,12 @@ const CategoryTruck = () => {
                 <Text style={styles.truckName}>{truck.truck_name || "Unnamed Truck"}</Text>
                 <Text style={styles.truckCapacity}>Capacity: {truck.capacity ?? "N/A"} Liters</Text>
                 <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => router.push(`../provider/editTruck/${truck.truck_id}`)}
-                >
-                  <Text style={styles.editButtonText}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(truck.truck_id)}>
-                  <Text style={styles.deleteButtonText}>Delete</Text>
-                </TouchableOpacity>
+  style={styles.editButton}
+  onPress={() => router.push("/provider/editTruck")}
+>
+  <Text style={styles.editButtonText}>Test Navigation</Text>
+</TouchableOpacity>
+
               </View>
             </View>
           ))
