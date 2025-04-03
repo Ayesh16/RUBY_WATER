@@ -59,7 +59,7 @@ const AddTruck = () => {
       console.log("✅ Truck added successfully:", response.data);
       Alert.alert("Success", "Truck added successfully!");
 
-      router.push("/provider/categoryTrucks"); // ✅ Redirect to truck list
+      router.push("/provider/providerhome"); // ✅ Redirect to truck list
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error("❌ API Error:", err.response?.data || err.message);
