@@ -59,7 +59,7 @@ const TruckDetails = () => {
         <Text style={styles.truckName}>{truck.truck_name || "Unknown Truck"}</Text>
         
         <Text style={styles.price}>₹{truck.price || "N/A"} <Text style={styles.discount}>₹{truck.original_price || "N/A"}</Text></Text>
-
+        <Text style={styles.truckdescription}>Category Description: {truck.category_description ?? "N/A"}</Text>
         <Text style={styles.truckCapacity}>💧 Capacity: {truck.capacity ?? "N/A"} Liters</Text>
         <Text style={styles.truckLocation}>📍 Location: {truck.location || "Not Available"}</Text>
         <Text style={styles.truckType}>🚛 Type: {truck.truck_type || "Unknown"}</Text>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   truckLocation: { fontSize: 18, marginTop: 5, color: "#007BFF" },
   truckType: { fontSize: 18, marginTop: 5, fontWeight: "500" },
   truckAvailability: { fontSize: 18, marginTop: 5, fontWeight: "bold", textAlign: "center" },
-
+  truckdescription: { fontSize: 18, fontWeight: "500", marginTop: 10 },
   /* Book Now Button */
   bookButton: { backgroundColor: "#0080FF", padding: 15, borderRadius: 10, marginTop: 20, alignItems: "center" },
   bookButtonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
