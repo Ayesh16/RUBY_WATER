@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, Image,
-  StyleSheet, ActivityIndicator, Alert
+  StyleSheet, ActivityIndicator, Alert, ScrollView
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import axios from "axios";
@@ -12,10 +12,13 @@ const API_URL = "http://localhost:5000";
 const EditTruck = () => {
   const router = useRouter();
   const { truckId } = useLocalSearchParams<{ truckId?: string }>();
-  
+
   const [truckName, setTruckName] = useState("");
   const [capacity, setCapacity] = useState("");
-  const [imageUri, setImageUri] = useState(""); // Image URL instead of picker
+  const [truckType, setTruckType] = useState("");
+  const [location, setLocation] = useState("");
+  const [categoryDescription, setCategoryDescription] = useState("");
+  const [imageUri, setImageUri] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -44,6 +47,9 @@ const EditTruck = () => {
       const truckData = response.data;
       setTruckName(truckData.truck_name);
       setCapacity(String(truckData.capacity));
+      setTruckType(truckData.truck_type);
+      setLocation(truckData.location);
+      setCategoryDescription(truckData.category_description);
       setImageUri(truckData.truck_image || ""); // Set existing image URL
     } catch (error) {
       console.error("❌ Error fetching truck details:", error);
@@ -54,8 +60,8 @@ const EditTruck = () => {
   };
 
   const handleUpdateTruck = async () => {
-    if (!truckName || !capacity) {
-      Alert.alert("Error", "Truck name and capacity are required.");
+    if (!truckName || !capacity || !truckType || !location || !categoryDescription) {
+      Alert.alert("Error", "All fields are required.");
       return;
     }
 
@@ -72,6 +78,9 @@ const EditTruck = () => {
         {
           truck_name: truckName,
           capacity: Number(capacity),
+          truck_type: truckType,
+          location: location,
+          category_description: categoryDescription,
           truck_image: imageUri, // Use the manually entered URL
         },
         {
@@ -80,7 +89,7 @@ const EditTruck = () => {
       );
 
       Alert.alert("Success", "Truck details updated!");
-      router.push("/provider/categoryTrucks");
+      router.push("/provider/providerhome");
     } catch (error) {
       console.error("❌ Update failed:", error);
       Alert.alert("Error", "Failed to update truck details.");
@@ -96,7 +105,7 @@ const EditTruck = () => {
       {isLoading ? (
         <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
       ) : (
-        <>
+        <ScrollView style={styles.scrollContainer}>
           <TextInput
             style={styles.input}
             placeholder="Truck Name"
@@ -110,14 +119,31 @@ const EditTruck = () => {
             onChangeText={setCapacity}
             keyboardType="numeric"
           />
-          
+          <TextInput
+            style={styles.input}
+            placeholder="Truck Type (e.g., Large, Small)"
+            value={truckType}
+            onChangeText={setTruckType}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Location"
+            value={location}
+            onChangeText={setLocation}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Category Description"
+            value={categoryDescription}
+            onChangeText={setCategoryDescription}
+          />
           <TextInput
             style={styles.input}
             placeholder="Truck Image URL"
             value={imageUri}
             onChangeText={setImageUri}
           />
-          
+
           {imageUri ? (
             <Image source={{ uri: imageUri }} style={styles.image} />
           ) : (
@@ -133,7 +159,7 @@ const EditTruck = () => {
               {isUpdating ? "Updating..." : "Update Truck"}
             </Text>
           </TouchableOpacity>
-        </>
+        </ScrollView>
       )}
     </View>
   );
@@ -141,6 +167,7 @@ const EditTruck = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20, alignItems: "center" },
+  scrollContainer: { width: "100%" },
   heading: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   input: {
     width: "100%",
