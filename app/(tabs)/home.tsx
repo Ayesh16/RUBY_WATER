@@ -129,10 +129,36 @@ const styles = StyleSheet.create({
   carouselContainer: { marginTop: 18, alignItems: "center" },
   offerImage: { width: width * 0.9, height: 200, borderRadius: 15, resizeMode: "cover" },
   sectionTitle: { fontSize: 22, fontWeight: "700", marginTop: 20, textAlign: "center", color: "#333" },
-  categoryGrid: { justifyContent: "space-between", paddingHorizontal: 15, marginTop: 10 },
-  categoryCard: { backgroundColor: "#fff", alignItems: "center", borderRadius: 12, width: width * 0.44, padding: 15, marginBottom: 15, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 5, elevation: 3 },
-  categoryImage: { width: 80, height: 80, borderRadius: 10 },
-  categoryText: { fontSize: 16, fontWeight: "bold", color: "#333", marginTop: 10, textAlign: "center" },
+  categoryGrid: { 
+    justifyContent: "space-between", 
+    paddingHorizontal: 10, 
+    marginTop: 10 
+  },
+  categoryCard: { 
+    backgroundColor: "#fff",
+    alignItems: "center",
+    borderRadius: 12,
+    width: (width - 40) / 2,  // Ensures proper fit
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3 
+  },
+  categoryImage: { 
+    width: "100%",  // Make image responsive
+    height: 100, 
+    borderRadius: 10, 
+    resizeMode: "contain" 
+  },
+  categoryText: { 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    color: "#333", 
+    marginTop: 10, 
+    textAlign: "center" 
+  },
   popularTruckCard: { backgroundColor: "#fff", marginHorizontal: 10, padding: 10, borderRadius: 10, alignItems: "center" },
   popularTruckImage: { width: 120, height: 80, borderRadius: 8 },
   popularTruckText: { fontSize: 14, fontWeight: "bold", marginTop: 5 },
