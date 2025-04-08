@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import Checkbox from "expo-checkbox"; 
+import Checkbox from "expo-checkbox";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation, useRouter } from "expo-router";
 import { useForm, Controller, useWatch } from "react-hook-form";
@@ -25,13 +25,33 @@ const schema = yup.object({
   name: yup.string().required("Customer name is required"),
   email: yup.string().email("Invalid email format").required("Email is required"),
   password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  address: yup.string().required("Address is required"),
+  phone: yup.string().required("Phone number is required"),
   checked: yup.boolean(),
-  truck_name: yup.string().when("checked", { is: true, then: (schema) => schema.required("Truck name is required") }),
-  capacity: yup.number().when("checked", { is: true, then: (schema) => schema.required("Truck capacity is required") }),
-  truck_type: yup.string().when("checked", { is: true, then: (schema) => schema.required("Truck type is required") }),
-  location: yup.string().when("checked", { is: true, then: (schema) => schema.required("Location is required") }),
-  category_id: yup.string().when("checked", { is: true, then: (schema) => schema.required("Category is required") }),
-  truck_image: yup.string().when("checked", { is: true, then: (schema) => schema.required("Truck image URL is required") }),
+  truck_name: yup.string().when("checked", {
+    is: true,
+    then: (schema) => schema.required("Truck name is required"),
+  }),
+  capacity: yup.number().when("checked", {
+    is: true,
+    then: (schema) => schema.required("Truck capacity is required"),
+  }),
+  truck_type: yup.string().when("checked", {
+    is: true,
+    then: (schema) => schema.required("Truck type is required"),
+  }),
+  location: yup.string().when("checked", {
+    is: true,
+    then: (schema) => schema.required("Location is required"),
+  }),
+  category_id: yup.string().when("checked", {
+    is: true,
+    then: (schema) => schema.required("Category is required"),
+  }),
+  truck_image: yup.string().when("checked", {
+    is: true,
+    then: (schema) => schema.required("Truck image URL is required"),
+  }),
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -40,9 +60,9 @@ export default function SignUp() {
   const navigation = useNavigation();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [categories, setCategories] = useState<{
-    name: string | undefined; _id: string; description: string 
-}[]>([]);
+  const [categories, setCategories] = useState<
+    { name: string | undefined; _id: string; description: string }[]
+  >([]);
 
   const {
     control,
@@ -56,7 +76,6 @@ export default function SignUp() {
   });
 
   const checked = useWatch({ control, name: "checked" });
-  const selectedCategoryId = watch("category_id");
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -75,14 +94,15 @@ export default function SignUp() {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      const selectedCategory = categories.find((cat) => cat._id === data.category_id);
       const payload = {
         name: data.name,
         email: data.email,
         password: data.password,
         checked: data.checked,
         role: data.checked ? "provider" : "user",
-        ...(data.checked && {  // ✅ Only send truckDetails if checked is true
+        address: data.address,
+        phone: data.phone,
+        ...(data.checked && {
           truck_name: data.truck_name,
           capacity: Number(data.capacity),
           truck_type: data.truck_type,
@@ -108,6 +128,7 @@ export default function SignUp() {
       <View style={styles.container}>
         <Text style={styles.title}>Sign Up</Text>
 
+        {/* Basic Inputs: Name, Email, Password */}
         {(["name", "email", "password"] as const).map((field) => (
           <View key={field}>
             <Controller
@@ -128,7 +149,44 @@ export default function SignUp() {
           </View>
         ))}
 
-        {/* ✅ Checkbox for Provider */}
+        {/* Address */}
+        <View>
+          <Controller
+            control={control}
+            name="address"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="Address"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value || ""}
+              />
+            )}
+          />
+          {errors.address && <Text style={styles.errorText}>{errors.address.message}</Text>}
+        </View>
+
+        {/* Phone */}
+        <View>
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="Phone"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value || ""}
+                keyboardType="phone-pad"
+              />
+            )}
+          />
+          {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
+        </View>
+
+        {/* Checkbox */}
         <View style={styles.checkboxContainer}>
           <Checkbox
             value={checked}
@@ -138,6 +196,7 @@ export default function SignUp() {
           <Text style={styles.checkboxLabel}>Register as Provider</Text>
         </View>
 
+        {/* Provider Truck Details */}
         {checked && (
           <>
             {(["truck_name", "capacity", "truck_type", "location", "truck_image"] as const).map((field) => (
@@ -160,7 +219,7 @@ export default function SignUp() {
               </View>
             ))}
 
-            {/* ✅ Category Dropdown */}
+            {/* Category Dropdown */}
             <View>
               <Text style={styles.label}>Select Category:</Text>
               <Controller
@@ -180,6 +239,7 @@ export default function SignUp() {
           </>
         )}
 
+        {/* Submit Button */}
         {isLoading ? (
           <ActivityIndicator size="large" color="#4CAF50" />
         ) : (

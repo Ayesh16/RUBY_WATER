@@ -13,6 +13,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import storage
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Navbar from "@/components/Navbar";
 
 const { width } = Dimensions.get("window");
 const API_BASE_URL = "http://localhost:5000"; // Backend API URL
@@ -51,6 +52,7 @@ const TrucksList = () => {
 
   return (
     <View style={styles.container}>
+       <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
       <Text style={styles.title}>🚛 Trucks for {categoryName}</Text>
 
       {loading ? (
