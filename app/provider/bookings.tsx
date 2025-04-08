@@ -9,16 +9,18 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Navbar from "@/components/Navbar";
 
-const API_URL = "http://localhost:5000/bookings";
+const API_URL = "http://localhost:5000/bookings"; // Replace with your LAN IP
 
 type Booking = {
   _id: string;
   customer_id?: string;
   truck_id?: string;
+  provider_id?: string;
   address: string;
-  phoneNumber?: string;
-  deliveryTime?: string;
+  phone?: string;
+  delivery_time?: string;
   status: string;
 };
 
@@ -32,14 +34,16 @@ const ProviderBookings: React.FC = () => {
     const token = await AsyncStorage.getItem("authToken");
 
     try {
-        const userId = await AsyncStorage.getItem("ownerId");
-        const res = await fetch(`${API_URL}?ownerId=${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
+      const providerId = await AsyncStorage.getItem("ownerId");
+      const res = await fetch(`${API_URL}?ownerId=${providerId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
       setBookings(data);
     } catch (error) {
       console.error("❌ Error fetching bookings:", error);
+      Alert.alert("Error", "Failed to fetch bookings.");
     } finally {
       setLoading(false);
     }
@@ -84,7 +88,13 @@ const ProviderBookings: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
+           <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
       <Text style={styles.header}>All Bookings</Text>
+
+      <TouchableOpacity onPress={fetchBookings} style={{ alignSelf: "flex-end", marginBottom: 10 }}>
+        <Text style={{ color: "#2196F3" }}>🔄 Refresh</Text>
+      </TouchableOpacity>
+
       {bookings.length === 0 ? (
         <Text style={styles.noBookings}>No bookings found</Text>
       ) : (
@@ -99,17 +109,17 @@ const ProviderBookings: React.FC = () => {
             <Text style={styles.label}>Address:</Text>
             <Text style={styles.text}>{booking.address}</Text>
 
-            {booking.phoneNumber && (
+            {booking.phone && (
               <>
                 <Text style={styles.label}>Phone:</Text>
-                <Text style={styles.text}>{booking.phoneNumber}</Text>
+                <Text style={styles.text}>{booking.phone}</Text>
               </>
             )}
 
-            {booking.deliveryTime && (
+            {booking.delivery_time && (
               <>
                 <Text style={styles.label}>Delivery Time:</Text>
-                <Text style={styles.text}>{new Date(booking.deliveryTime).toLocaleString()}</Text>
+                <Text style={styles.text}>{new Date(booking.delivery_time).toLocaleString()}</Text>
               </>
             )}
 

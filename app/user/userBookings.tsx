@@ -8,9 +8,8 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import axios, { AxiosError }  from 'axios';
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Navbar from '@/components/Navbar';
 
 const API_URL = 'http://localhost:5000';
 
@@ -25,101 +24,78 @@ const UserBookings = () => {
   const fetchUserBookings = async () => {
     try {
       const userId = await AsyncStorage.getItem('ownerId');
-      const token = await AsyncStorage.getItem('authToken'); // ✅ get the token
-  
+      const token = await AsyncStorage.getItem('authToken');
+
       if (!userId || !token) {
-        console.warn('User ID or token not found');
         Alert.alert('Error', 'Please log in again.');
         return;
       }
-  
+
       const response = await axios.get(`${API_URL}/bookings/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // ✅ add this
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       setBookings(response.data);
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        console.error('Error fetching bookings:', err.response?.data || err.message);
-        Alert.alert('Error', err.response?.data?.message || 'Failed to fetch bookings');
-      } else {
-        console.error('Unknown error:', err);
-        Alert.alert('Error', 'Something went wrong');
-      }
+    } catch (err: any) {
+      Alert.alert('Error', err.response?.data?.message || 'Failed to fetch bookings');
     } finally {
       setLoading(false);
     }
   };
-  
+
   const cancelBooking = async (bookingId: string) => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) {
-        Alert.alert('Unauthorized', 'Please log in again.');
-        return;
-      }
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) {
+      Alert.alert('Unauthorized', 'Please log in again.');
+      return;
+    }
 
-      Alert.alert(
-        'Cancel Booking',
-        'Are you sure you want to cancel this booking?',
-        [
-          { text: 'No', style: 'cancel' },
-          {
-            text: 'Yes',
-            style: 'destructive',
-            onPress: async () => {
-                console.log('🚨 Sending DELETE request');
-                try {
-                  await axios.delete(`${API_URL}/bookings/${bookingId}`, {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  });
-                  console.log('🔐 Token:', token);
-                  console.log('📤 Sending delete for bookingId:', bookingId);
+    Alert.alert('Cancel Booking', 'Are you sure you want to cancel this booking?', [
+      { text: 'No', style: 'cancel' },
+      {
+        text: 'Yes',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await axios.delete(`${API_URL}/bookings/${bookingId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            Alert.alert('Cancelled', 'Booking has been cancelled.');
+            fetchUserBookings();
+          } catch (err) {
+            Alert.alert('Error', 'Failed to cancel booking');
+          }
+        },
+      },
+    ]);
+  };
 
-                  Alert.alert('Cancelled', 'Booking has been cancelled.');
-                  setLoading(true);
-                  fetchUserBookings();
-                } catch (err) {
-                  console.error('❌ Cancel error:', err);
-                  Alert.alert('Error', 'Failed to cancel booking');
-                }}
-            }
-        ]
-      );
-    } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-          console.error('Cancel error:', error.response?.data || error.message);
-          Alert.alert('Error', error.response?.data?.message || 'Failed to cancel booking');
-        } else {
-          console.error('Unexpected error:', error);
-          Alert.alert('Error', 'Something went wrong');
-        }
-      }
+  const statusColorMap: Record<string, string> = {
+    pending: '#ffc107',
+    confirmed: '#28a745',
+    cancelled: '#dc3545',
+    delivered: '#17a2b8',
   };
 
   const renderBooking = ({ item }: any) => {
-    const statusColor =
-      item.status === 'pending'
-        ? '#ffc107'
-        : item.status === 'confirmed'
-        ? '#28a745'
-        : item.status === 'cancelled'
-        ? '#dc3545'
-        : '#6c757d';
+    const statusColor = statusColorMap[item.status?.toLowerCase()] || '#6c757d';
 
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>🚛 Truck ID: {item.truck_id}</Text>
+        <Text style={styles.title}>
+          🚛 Truck: {item.truck?.name || item.truck_id}
+        </Text>
         <Text style={styles.detail}>📍 Address: {item.address}</Text>
         <Text style={styles.detail}>📞 Phone: {item.phone}</Text>
-        <Text style={styles.detail}>📅 Delivery: {new Date(item.delivery_time).toLocaleString()}</Text>
+        <Text style={styles.detail}>
+          📅 Delivery:{' '}
+          {item.delivery_time
+            ? new Date(item.delivery_time).toLocaleString()
+            : 'Not set'}
+        </Text>
 
         <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-          <Text style={styles.statusText}>{item.status.toUpperCase()}</Text>
+          <Text style={styles.statusText}>{item.status?.toUpperCase()}</Text>
         </View>
 
         {item.status !== 'cancelled' && (
@@ -149,6 +125,8 @@ const UserBookings = () => {
       data={bookings}
       keyExtractor={(item) => item._id}
       renderItem={renderBooking}
+      refreshing={loading}
+      onRefresh={fetchUserBookings}
       contentContainerStyle={{ padding: 15 }}
     />
   );
