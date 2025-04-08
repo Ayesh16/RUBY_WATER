@@ -32,6 +32,13 @@ const ProviderHome = () => {
 
       <ScrollView>
         {/* Banner */}
+
+        <View>
+      <Text>Welcome Provider!</Text>
+      <TouchableOpacity onPress={() => router.push("../provider/bookings")}>
+        <Text style={{ color: "blue", marginTop: 20 }}>View Bookings</Text>
+      </TouchableOpacity>
+    </View>
         <View style={styles.banner}>
           <Text style={styles.bannerText}>Manage Your Water Trucks</Text>
         </View>
