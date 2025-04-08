@@ -12,7 +12,7 @@ import axios, { AxiosError }  from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '@/components/Navbar';
 
-const API_URL = 'http://192.168.1.43:5000';
+const API_URL = 'http://localhost:5000';
 
 const UserBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -113,7 +113,6 @@ const UserBookings = () => {
 
     return (
       <View style={styles.card}>
-         <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
         <Text style={styles.title}>🚛 Truck ID: {item.truck_id}</Text>
         <Text style={styles.detail}>📍 Address: {item.address}</Text>
         <Text style={styles.detail}>📞 Phone: {item.phone}</Text>
