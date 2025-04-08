@@ -23,21 +23,21 @@ export default function TabLayout() {
           ),
         }}
       />
+        <Tabs.Screen
+        name="userBookings"
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="user" size={size} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="contact"
         options={{
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="phone" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="userBookings"
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="user" size={size} color={color} />
           ),
         }}
       />
