@@ -9,8 +9,6 @@ const API_URL = "http://localhost:5000";
 const AddTruck = () => {
   const router = useRouter();
   const { categoryId } = useLocalSearchParams();
-
-  // ✅ Ensure categoryId is always a string
   const categoryIdString = Array.isArray(categoryId) ? categoryId[0] : categoryId || "";
 
   const [truckName, setTruckName] = useState("");
@@ -19,10 +17,11 @@ const AddTruck = () => {
   const [location, setLocation] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
   const [truckImage, setTruckImage] = useState("");
+  const [price, setPrice] = useState(""); // ✅ New price field
   const [loading, setLoading] = useState(false);
 
   const handleAddTruck = async () => {
-    if (!truckName || !capacity || !truckType || !location || !categoryIdString || !categoryDescription || !truckImage) {
+    if (!truckName || !capacity || !truckType || !location || !categoryIdString || !categoryDescription || !truckImage || !price) {
       Alert.alert("Error", "Please fill all the fields.");
       return;
     }
@@ -42,12 +41,13 @@ const AddTruck = () => {
       const truckData = {
         truck_name: truckName.trim(),
         owner_id: ownerId.trim(),
-        category_id: categoryIdString.trim(), // ✅ Ensuring it's always a string
+        category_id: categoryIdString.trim(),
         capacity: Number(capacity),
         truck_type: truckType.trim(),
         location: location.trim(),
         category_description: categoryDescription.trim(),
         truck_image: truckImage.trim(),
+        price: Number(price), // ✅ Add price to payload
       };
 
       console.log("🚀 Sending Truck Data:", truckData);
@@ -58,8 +58,7 @@ const AddTruck = () => {
 
       console.log("✅ Truck added successfully:", response.data);
       Alert.alert("Success", "Truck added successfully!");
-
-      router.push("/provider/providerhome"); // ✅ Redirect to truck list
+      router.push("/provider/providerhome");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error("❌ API Error:", err.response?.data || err.message);
@@ -81,12 +80,10 @@ const AddTruck = () => {
       <TextInput placeholder="Capacity (Liters)" value={capacity} onChangeText={setCapacity} keyboardType="numeric" style={styles.input} />
       <TextInput placeholder="Truck Type" value={truckType} onChangeText={setTruckType} style={styles.input} />
       <TextInput placeholder="Location" value={location} onChangeText={setLocation} style={styles.input} />
-
-      {/* ✅ Auto-filled Category ID (Disabled Input) */}
       <TextInput placeholder="Category ID" value={categoryIdString} editable={false} style={[styles.input, styles.disabledInput]} />
-
       <TextInput placeholder="Category Description" value={categoryDescription} onChangeText={setCategoryDescription} style={styles.input} />
       <TextInput placeholder="Truck Image URL" value={truckImage} onChangeText={setTruckImage} style={styles.input} />
+      <TextInput placeholder="Price (₹)" value={price} onChangeText={setPrice} keyboardType="numeric" style={styles.input} /> {/* ✅ Price input */}
 
       <TouchableOpacity onPress={handleAddTruck} style={styles.addButton} disabled={loading}>
         {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.addButtonText}>Add Truck</Text>}
@@ -99,7 +96,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20 },
   heading: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
   input: { backgroundColor: "#FFF", padding: 10, marginBottom: 10, borderRadius: 5, borderWidth: 1, borderColor: "#CCC" },
-  disabledInput: { backgroundColor: "#E0E0E0", color: "#888" }, // 🔹 Style for disabled input
+  disabledInput: { backgroundColor: "#E0E0E0", color: "#888" },
   addButton: { backgroundColor: "#0080FF", padding: 12, borderRadius: 5, alignItems: "center" },
   addButtonText: { color: "#FFF", fontSize: 16, fontWeight: "bold" },
 });

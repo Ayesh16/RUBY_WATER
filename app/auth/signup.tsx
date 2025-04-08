@@ -44,6 +44,10 @@ const schema = yup.object({
     is: true,
     then: (schema) => schema.required("Location is required"),
   }),
+  price: yup.number().when("checked", {
+    is: true,
+    then: (schema) => schema.required("Price is required"),
+  }),
   category_id: yup.string().when("checked", {
     is: true,
     then: (schema) => schema.required("Category is required"),
@@ -61,7 +65,7 @@ export default function SignUp() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<
-    { name: string | undefined; _id: string; description: string }[]
+    { name: string; _id: string; description: string }[]
   >([]);
 
   const {
@@ -78,7 +82,7 @@ export default function SignUp() {
   const checked = useWatch({ control, name: "checked" });
 
   useEffect(() => {
-    navigation.setOptions({ headerShown: false });
+    navigation.setOptions?.({ headerShown: false });
     fetchCategories();
   }, []);
 
@@ -107,11 +111,13 @@ export default function SignUp() {
           capacity: Number(data.capacity),
           truck_type: data.truck_type,
           location: data.location,
+          price: Number(data.price),
           category_id: data.category_id,
           truck_image: data.truck_image,
         }),
       };
-      console.log("🚀 Sending Payload:", JSON.stringify(payload, null, 2));
+
+      console.log("🚀 Payload:", payload);
       await axios.post(API_URL, payload);
       Alert.alert("Success", "Signup Successful!");
       router.push("/auth/login");
@@ -128,7 +134,7 @@ export default function SignUp() {
       <View style={styles.container}>
         <Text style={styles.title}>Sign Up</Text>
 
-        {/* Basic Inputs: Name, Email, Password */}
+        {/* Basic Fields */}
         {(["name", "email", "password"] as const).map((field) => (
           <View key={field}>
             <Controller
@@ -150,56 +156,52 @@ export default function SignUp() {
         ))}
 
         {/* Address */}
-        <View>
-          <Controller
-            control={control}
-            name="address"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="Address"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value || ""}
-              />
-            )}
-          />
-          {errors.address && <Text style={styles.errorText}>{errors.address.message}</Text>}
-        </View>
+        <Controller
+          control={control}
+          name="address"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="Address"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value || ""}
+            />
+          )}
+        />
+        {errors.address && <Text style={styles.errorText}>{errors.address.message}</Text>}
 
         {/* Phone */}
-        <View>
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="Phone"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value || ""}
-                keyboardType="phone-pad"
-              />
-            )}
-          />
-          {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
-        </View>
+        <Controller
+          control={control}
+          name="phone"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="Phone"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value || ""}
+              keyboardType="phone-pad"
+            />
+          )}
+        />
+        {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
 
         {/* Checkbox */}
         <View style={styles.checkboxContainer}>
           <Checkbox
             value={checked}
-            onValueChange={(newValue) => setValue("checked", newValue)}
+            onValueChange={(val) => setValue("checked", val)}
             color={checked ? "blue" : undefined}
           />
           <Text style={styles.checkboxLabel}>Register as Provider</Text>
         </View>
 
-        {/* Provider Truck Details */}
+        {/* Provider Truck Fields */}
         {checked && (
           <>
-            {(["truck_name", "capacity", "truck_type", "location", "truck_image"] as const).map((field) => (
+            {(["truck_name", "capacity", "truck_type", "location", "price", "truck_image"] as const).map((field) => (
               <View key={field}>
                 <Controller
                   control={control}
@@ -211,7 +213,7 @@ export default function SignUp() {
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={value?.toString() || ""}
-                      keyboardType={field === "capacity" ? "numeric" : "default"}
+                      keyboardType={["capacity", "price"].includes(field) ? "numeric" : "default"}
                     />
                   )}
                 />
@@ -220,34 +222,33 @@ export default function SignUp() {
             ))}
 
             {/* Category Dropdown */}
-            <View>
-              <Text style={styles.label}>Select Category:</Text>
-              <Controller
-                control={control}
-                name="category_id"
-                render={({ field: { onChange, value } }) => (
-                  <Picker selectedValue={value} onValueChange={onChange} style={styles.input}>
-                    <Picker.Item label="Select a category" value="" />
-                    {categories.map((cat) => (
-                      <Picker.Item key={cat._id} label={cat.name} value={cat._id} />
-                    ))}
-                  </Picker>
-                )}
-              />
-              {errors.category_id && <Text style={styles.errorText}>{errors.category_id.message}</Text>}
-            </View>
+            <Text style={styles.label}>Select Category:</Text>
+            <Controller
+              control={control}
+              name="category_id"
+              render={({ field: { onChange, value } }) => (
+                <Picker selectedValue={value} onValueChange={onChange} style={styles.input}>
+                  <Picker.Item label="Select a category" value="" />
+                  {categories.map((cat) => (
+                    <Picker.Item key={cat._id} label={cat.name} value={cat._id} />
+                  ))}
+                </Picker>
+              )}
+            />
+            {errors.category_id && <Text style={styles.errorText}>{errors.category_id.message}</Text>}
           </>
         )}
 
         {/* Submit Button */}
         {isLoading ? (
-          <ActivityIndicator size="large" color="#4CAF50" />
+          <ActivityIndicator size="large" color="blue" />
         ) : (
           <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
         )}
 
+        {/* Login Link */}
         <View style={styles.loginLinkContainer}>
           <Text>Already a user?</Text>
           <TouchableOpacity onPress={() => router.push("/auth/login")}>
@@ -262,14 +263,15 @@ export default function SignUp() {
 const styles = StyleSheet.create({
   container: { padding: 20 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10 },
-  label: { fontWeight: "bold", marginBottom: 5 },
+  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
+  label: { fontWeight: "bold", marginVertical: 5 },
   checkboxContainer: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
   checkboxLabel: { marginLeft: 10, fontSize: 16 },
-  button: { backgroundColor: "blue", padding: 15, borderRadius: 5 },
-  buttonText: { color: "white", textAlign: "center" },
-  errorText: { color: "red" },
-  loginLink: { color: "#007BFF", fontWeight: "bold", textDecorationLine: "underline" },
+  button: { backgroundColor: "blue", padding: 15, borderRadius: 5, marginTop: 10 },
+  buttonText: { color: "white", textAlign: "center", fontWeight: "bold" },
+  errorText: { color: "red", marginBottom: 5 },
   loginLinkContainer: { flexDirection: "row", justifyContent: "center", marginTop: 15 },
+  loginLink: { color: "#007BFF", fontWeight: "bold", textDecorationLine: "underline" },
 });
+
 

@@ -32,10 +32,11 @@ const ProviderBookings: React.FC = () => {
     const token = await AsyncStorage.getItem("authToken");
 
     try {
-      const res = await fetch(API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
+        const userId = await AsyncStorage.getItem("ownerId");
+        const res = await fetch(`${API_URL}?ownerId=${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
       setBookings(data);
     } catch (error) {
       console.error("❌ Error fetching bookings:", error);

@@ -1,14 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
+import { AntDesign } from "@expo/vector-icons"; // For icon in banner
 
-const API_URL = "http://localhost:5000/categories"; // Update with actual backend URL
+const API_URL = "http://localhost:5000/categories"; // Replace with your IP on device testing
 
 const ProviderHome = () => {
   const router = useRouter();
-  const [categories, setCategories] = useState<{ _id: string; name: string; image: string }[]>([]);
+  const [categories, setCategories] = useState<
+    { _id: string; name: string; image: string }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,36 +41,46 @@ const ProviderHome = () => {
     <View style={styles.container}>
       <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
 
-      <ScrollView>
-        {/* Banner */}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header Row */}
+        <View style={styles.headerRow}>
+          <Text style={styles.welcomeText}>👋 Welcome, Provider!</Text>
+          <TouchableOpacity onPress={() => router.push("/provider/bookings")}>
+            <Text style={styles.viewLink}>View Bookings</Text>
+          </TouchableOpacity>
+        </View>
 
-        <View>
-      <Text>Welcome Provider!</Text>
-      <TouchableOpacity onPress={() => router.push("../provider/bookings")}>
-        <Text style={{ color: "blue", marginTop: 20 }}>View Bookings</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Banner */}
         <View style={styles.banner}>
+          <AntDesign name="car" size={28} color="#fff" />
           <Text style={styles.bannerText}>Manage Your Water Trucks</Text>
         </View>
 
         {/* Category Section */}
-        <Text style={styles.heading}>Choose a Truck Category</Text>
+        <Text style={styles.heading}>🚛 Choose a Truck Category</Text>
 
         {loading ? (
           <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
         ) : (
           <View style={styles.categoryGrid}>
             {categories.map((category) => (
-            <TouchableOpacity
-            key={category._id}
-            style={styles.categoryCard}
-            onPress={() => router.push(`/provider/categoryTrucks?category_id=${category._id}&category_name=${encodeURIComponent(category.name)}`)}
-          >
-            <Image source={{ uri: category.image }} style={styles.categoryImage} />
-            <Text style={styles.categoryText}>{category.name}</Text>  {/* ✅ Display category name */}
-          </TouchableOpacity>
-          
+              <TouchableOpacity
+                key={category._id}
+                style={styles.categoryCard}
+                onPress={() =>
+                  router.push(
+                    `/provider/categoryTrucks?category_id=${category._id}&category_name=${encodeURIComponent(
+                      category.name
+                    )}`
+                  )
+                }
+              >
+                <Image
+                  source={{ uri: category.image || "https://via.placeholder.com/110" }}
+                  style={styles.categoryImage}
+                />
+                <Text style={styles.categoryText}>{category.name}</Text>
+              </TouchableOpacity>
             ))}
           </View>
         )}
@@ -69,29 +90,92 @@ const ProviderHome = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 15 },
-  banner: { alignItems: "center", padding: 20, margin: 20, backgroundColor: "#0080FF", borderRadius: 12 },
-  bannerText: { fontSize: 22, fontWeight: "bold", color: "#fff" },
-  heading: { fontSize: 22, fontWeight: "700", marginTop: 20, textAlign: "center", color: "#222" },
-  categoryGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: 15 },
+  container: {
+    flex: 1,
+    backgroundColor: "#F3F8FF",
+    padding: 15,
+  },
+  headerRow: {
+    marginTop: 10,
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  welcomeText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  viewLink: {
+    color: "#0080FF",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    marginVertical: 20,
+    backgroundColor: "#0080FF",
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  bannerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginLeft: 12,
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 10,
+    textAlign: "center",
+    color: "#222",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  categoryGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
   categoryCard: {
     backgroundColor: "#fff",
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 15,
     alignItems: "center",
     width: "48%",
     marginBottom: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
     borderWidth: 1,
     borderColor: "#E0E0E0",
   },
-  categoryImage: { width: 110, height: 110 },
-  categoryText: { fontSize: 16, fontWeight: "500", textAlign: "center", marginTop: 5, color: "#333" },
+  categoryImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  categoryText: {
+    fontSize: 15,
+    fontWeight: "500",
+    textAlign: "center",
+    marginTop: 10,
+    color: "#333",
+  },
 });
 
 export default ProviderHome;
-

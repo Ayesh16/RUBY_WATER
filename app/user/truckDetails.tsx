@@ -141,7 +141,7 @@ const TruckDetails = () => {
       <View style={styles.detailsCard}>
         <Text style={styles.truckName}>{truck.truck_name}</Text>
         <Text style={styles.price}>
-          ₹{truck.price} <Text style={styles.discount}>₹{truck.original_price}</Text>
+          ₹{truck.price} <Text style={styles.discount}>{truck.original_price}</Text>
         </Text>
         <Text style={styles.truckdescription}>Description: {truck.category_description}</Text>
         <Text style={styles.truckCapacity}>💧 Capacity: {truck.capacity} Liters</Text>

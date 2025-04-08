@@ -19,6 +19,7 @@ const EditTruck = () => {
   const [location, setLocation] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
   const [imageUri, setImageUri] = useState("");
+  const [price, setPrice] = useState(""); // ✅ New
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -50,7 +51,8 @@ const EditTruck = () => {
       setTruckType(truckData.truck_type);
       setLocation(truckData.location);
       setCategoryDescription(truckData.category_description);
-      setImageUri(truckData.truck_image || ""); // Set existing image URL
+      setImageUri(truckData.truck_image || "");
+      setPrice(String(truckData.price || "")); // ✅ Load existing price
     } catch (error) {
       console.error("❌ Error fetching truck details:", error);
       Alert.alert("Error", "Failed to load truck details.");
@@ -60,7 +62,7 @@ const EditTruck = () => {
   };
 
   const handleUpdateTruck = async () => {
-    if (!truckName || !capacity || !truckType || !location || !categoryDescription) {
+    if (!truckName || !capacity || !truckType || !location || !categoryDescription || !price) {
       Alert.alert("Error", "All fields are required.");
       return;
     }
@@ -79,9 +81,10 @@ const EditTruck = () => {
           truck_name: truckName,
           capacity: Number(capacity),
           truck_type: truckType,
-          location: location,
+          location,
           category_description: categoryDescription,
-          truck_image: imageUri, // Use the manually entered URL
+          truck_image: imageUri,
+          price: Number(price), // ✅ Include price
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -106,43 +109,13 @@ const EditTruck = () => {
         <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
       ) : (
         <ScrollView style={styles.scrollContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Truck Name"
-            value={truckName}
-            onChangeText={setTruckName}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Capacity (Liters)"
-            value={capacity}
-            onChangeText={setCapacity}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Truck Type (e.g., Large, Small)"
-            value={truckType}
-            onChangeText={setTruckType}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Location"
-            value={location}
-            onChangeText={setLocation}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Category Description"
-            value={categoryDescription}
-            onChangeText={setCategoryDescription}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Truck Image URL"
-            value={imageUri}
-            onChangeText={setImageUri}
-          />
+          <TextInput style={styles.input} placeholder="Truck Name" value={truckName} onChangeText={setTruckName} />
+          <TextInput style={styles.input} placeholder="Capacity (Liters)" value={capacity} onChangeText={setCapacity} keyboardType="numeric" />
+          <TextInput style={styles.input} placeholder="Truck Type (e.g., Large, Small)" value={truckType} onChangeText={setTruckType} />
+          <TextInput style={styles.input} placeholder="Location" value={location} onChangeText={setLocation} />
+          <TextInput style={styles.input} placeholder="Category Description" value={categoryDescription} onChangeText={setCategoryDescription} />
+          <TextInput style={styles.input} placeholder="Truck Image URL" value={imageUri} onChangeText={setImageUri} />
+          <TextInput style={styles.input} placeholder="Price (₹)" value={price} onChangeText={setPrice} keyboardType="numeric" /> {/* ✅ Price input */}
 
           {imageUri ? (
             <Image source={{ uri: imageUri }} style={styles.image} />
@@ -150,11 +123,7 @@ const EditTruck = () => {
             <Text style={styles.imagePlaceholder}>Enter a valid image URL</Text>
           )}
 
-          <TouchableOpacity
-            style={styles.updateButton}
-            onPress={handleUpdateTruck}
-            disabled={isUpdating}
-          >
+          <TouchableOpacity style={styles.updateButton} onPress={handleUpdateTruck} disabled={isUpdating}>
             <Text style={styles.updateButtonText}>
               {isUpdating ? "Updating..." : "Update Truck"}
             </Text>
