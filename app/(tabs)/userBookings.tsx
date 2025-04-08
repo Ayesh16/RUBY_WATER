@@ -43,32 +43,7 @@ const UserBookings = () => {
     }
   };
 
-  const cancelBooking = async (bookingId: string) => {
-    const token = await AsyncStorage.getItem('authToken');
-    if (!token) {
-      Alert.alert('Unauthorized', 'Please log in again.');
-      return;
-    }
-
-    Alert.alert('Cancel Booking', 'Are you sure you want to cancel this booking?', [
-      { text: 'No', style: 'cancel' },
-      {
-        text: 'Yes',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await axios.delete(`${API_URL}/bookings/${bookingId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            Alert.alert('Cancelled', 'Booking has been cancelled.');
-            fetchUserBookings();
-          } catch (err) {
-            Alert.alert('Error', 'Failed to cancel booking');
-          }
-        },
-      },
-    ]);
-  };
+ 
 
   const statusColorMap: Record<string, string> = {
     pending: '#ffc107',
@@ -97,15 +72,6 @@ const UserBookings = () => {
         <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
           <Text style={styles.statusText}>{item.status?.toUpperCase()}</Text>
         </View>
-
-        {item.status !== 'cancelled' && (
-          <TouchableOpacity
-            onPress={() => cancelBooking(item._id)}
-            style={styles.cancelBtn}
-          >
-            <Text style={styles.cancelBtnText}>Cancel Booking</Text>
-          </TouchableOpacity>
-        )}
       </View>
     );
   };
@@ -168,17 +134,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 13,
-  },
-  cancelBtn: {
-    marginTop: 15,
-    backgroundColor: '#dc3545',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
   emptyText: {
     textAlign: 'center',

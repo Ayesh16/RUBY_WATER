@@ -14,7 +14,7 @@ const BookingSuccess = () => {
       <Text style={styles.title}>Booking Confirmed! 🎉</Text>
       <Text style={styles.message}>Your water truck will arrive as scheduled.</Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => router.push("/user/userBookings")}>
+      <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/userBookings")}>
         <Text style={styles.buttonText}>Go to My Bookings</Text>
       </TouchableOpacity>
     </View>
