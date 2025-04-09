@@ -6,7 +6,7 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={{ tabBarShowLabel: true }}>
       <Tabs.Screen
-        name="home"
+        name="providerhome"
         options={{
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
@@ -24,7 +24,7 @@ export default function TabLayout() {
         }}
       />
         <Tabs.Screen
-        name="userBookings"
+        name="bookings"
         options={{
           headerShown: false,
           tabBarIcon: ({ color, size }) => (

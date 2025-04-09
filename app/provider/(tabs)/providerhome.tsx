@@ -42,14 +42,6 @@ const ProviderHome = () => {
       <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header Row */}
-        <View style={styles.headerRow}>
-          <Text style={styles.welcomeText}>👋 Welcome, Provider!</Text>
-          <TouchableOpacity onPress={() => router.push("/provider/bookings")}>
-            <Text style={styles.viewLink}>View Bookings</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Banner */}
         <View style={styles.banner}>
           <AntDesign name="car" size={28} color="#fff" />
@@ -94,23 +86,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F3F8FF",
     padding: 15,
-  },
-  headerRow: {
-    marginTop: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  welcomeText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  viewLink: {
-    color: "#0080FF",
-    fontWeight: "bold",
-    fontSize: 14,
   },
   banner: {
     flexDirection: "row",

@@ -16,6 +16,7 @@ const API_URL = 'http://localhost:5000';
 const UserBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedStatusId, setExpandedStatusId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUserBookings();
@@ -43,8 +44,6 @@ const UserBookings = () => {
     }
   };
 
- 
-
   const statusColorMap: Record<string, string> = {
     pending: '#ffc107',
     confirmed: '#28a745',
@@ -52,14 +51,17 @@ const UserBookings = () => {
     delivered: '#17a2b8',
   };
 
+  const toggleStatus = (id: string) => {
+    setExpandedStatusId((prev) => (prev === id ? null : id));
+  };
+
   const renderBooking = ({ item }: any) => {
     const statusColor = statusColorMap[item.status?.toLowerCase()] || '#6c757d';
+    const isExpanded = expandedStatusId === item._id;
 
     return (
       <View style={styles.card}>
-        <Text style={styles.title}>
-          🚛 Truck: {item.truck?.name || item.truck_id}
-        </Text>
+        <Text style={styles.title}>🚛 Truck: {item.truck?.name || item.truck_id}</Text>
         <Text style={styles.detail}>📍 Address: {item.address}</Text>
         <Text style={styles.detail}>📞 Phone: {item.phone}</Text>
         <Text style={styles.detail}>
@@ -69,9 +71,17 @@ const UserBookings = () => {
             : 'Not set'}
         </Text>
 
-        <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-          <Text style={styles.statusText}>{item.status?.toUpperCase()}</Text>
-        </View>
+        <TouchableOpacity onPress={() => toggleStatus(item._id)}>
+          <Text style={styles.viewStatusText}>
+            {isExpanded ? 'Hide Status' : 'View Status'}
+          </Text>
+        </TouchableOpacity>
+
+        {isExpanded && (
+          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+            <Text style={styles.statusText}>{item.status?.toUpperCase()}</Text>
+          </View>
+        )}
       </View>
     );
   };
@@ -134,6 +144,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 13,
+  },
+  viewStatusText: {
+    marginTop: 10,
+    color: '#007bff',
+    fontWeight: '600',
+    fontSize: 15,
   },
   emptyText: {
     textAlign: 'center',
