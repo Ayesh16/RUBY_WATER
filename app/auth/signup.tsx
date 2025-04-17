@@ -18,8 +18,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/auth/signup";
-const CATEGORY_URL = "http://localhost:5000/categories";
+const API_URL = "http://192.168.1.41:5000/auth/signup";
+const CATEGORY_URL = "http://192.168.1.41:5000/categories";
 
 const schema = yup.object({
   name: yup.string().required("Customer name is required"),

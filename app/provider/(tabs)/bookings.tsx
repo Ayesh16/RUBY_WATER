@@ -11,7 +11,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Navbar from "@/components/Navbar";
 
-const API_URL = "http://localhost:5000/bookings"; // Replace with your LAN IP
+const API_URL = "http://192.168.1.41:5000/bookings"; // Replace with your LAN IP
 
 type Booking = {
   _id: string;
