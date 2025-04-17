@@ -95,10 +95,16 @@ const TruckDetails = () => {
           "Content-Type": "application/json",
         },
       });
-
-      showMessage("🎉 Your booking has been placed!");
       setShowBookingForm(false);
-      router.push("/bookings/booking-success");
+      router.push({
+        pathname: "/payments/checkout",
+        params: {
+          booking_id: response.data._id, // Assuming booking ID is returned
+          user_id: userId,
+          amount: truck.price,
+        },
+      });
+      
     } catch (error: any) {
       console.error("❌ Booking failed:", error.response?.data || error.message);
       showMessage("Booking failed. Something went wrong.");
