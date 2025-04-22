@@ -13,7 +13,7 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Modal from "react-native-modal";
 import Navbar from "@/components/Navbar";
 
@@ -28,7 +28,7 @@ const TruckDetails = () => {
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [deliveryDate, setDeliveryDate] = useState<Date>(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const [modalMessage, setModalMessage] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -123,23 +123,12 @@ const TruckDetails = () => {
     setInputModalVisible(true);
   };
 
-  const handleWebPrompt = () => {
-    openInputModal("Enter delivery datetime (YYYY-MM-DDTHH:mm)", deliveryDate.toISOString().slice(0, 16), (val) => {
-      const parsed = new Date(val);
-      if (!isNaN(parsed.getTime())) {
-        setDeliveryDate(parsed);
-      } else {
-        showMessage("Invalid date format.");
-      }
-    });
-  };
-
   if (loading) return <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />;
   if (!truck) return <Text style={styles.errorText}>Truck details not found.</Text>;
 
   return (
     <ScrollView style={styles.container}>
-       <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+      <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
       <View style={styles.imageContainer}>
         <Image source={{ uri: truck.truck_image }} style={styles.truckImage} />
       </View>
@@ -149,7 +138,7 @@ const TruckDetails = () => {
         <Text style={styles.price}>
           ₹{truck.price} <Text style={styles.discount}>{truck.original_price}</Text>
         </Text>
-        <Text style={styles.truckdescription}>Description: {truck.category_description}</Text>
+        <Text style={styles.truckDescription}>Description: {truck.category_description}</Text>
         <Text style={styles.truckCapacity}>💧 Capacity: {truck.capacity} Liters</Text>
         <Text style={styles.truckLocation}>📍 Location: {truck.location}</Text>
         <Text style={styles.truckType}>🚛 Type: {truck.truck_type}</Text>
@@ -180,28 +169,20 @@ const TruckDetails = () => {
             </TouchableOpacity>
 
             <Text style={styles.label}>📅 Delivery Date & Time</Text>
-            {Platform.OS === "web" ? (
-              <TouchableOpacity onPress={handleWebPrompt} style={styles.inputBox}>
-                <Text>{deliveryDate.toLocaleString()}</Text>
-              </TouchableOpacity>
-            ) : (
-              <>
-                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.inputBox}>
-                  <Text>{deliveryDate.toLocaleString()}</Text>
-                </TouchableOpacity>
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={deliveryDate}
-                    mode="datetime"
-                    display="default"
-                    onChange={(e, date) => {
-                      setShowDatePicker(false);
-                      if (date) setDeliveryDate(date);
-                    }}
-                  />
-                )}
-              </>
-            )}
+            <TouchableOpacity onPress={() => setDatePickerVisibility(true)} style={styles.inputBox}>
+              <Text>{deliveryDate.toLocaleString()}</Text>
+            </TouchableOpacity>
+
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="datetime"
+              date={deliveryDate}
+              onConfirm={(date) => {
+                setDeliveryDate(date);
+                setDatePickerVisibility(false);
+              }}
+              onCancel={() => setDatePickerVisibility(false)}
+            />
 
             <TouchableOpacity style={[styles.bookButton, { backgroundColor: "#28A745" }]} onPress={handleConfirmBooking}>
               <Text style={styles.bookButtonText}>Confirm Booking</Text>
@@ -255,36 +236,35 @@ const styles = StyleSheet.create({
     shadowColor: "#000", shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1, shadowRadius: 5, elevation: 5,
   },
+  truckDescription: { fontSize: 16, marginVertical: 5, color: "#555" },
   truckName: { fontSize: 22, fontWeight: "bold", textAlign: "center", color: "#333" },
   price: { fontSize: 22, fontWeight: "bold", color: "#0080FF", textAlign: "center", marginVertical: 5 },
   discount: { fontSize: 18, textDecorationLine: "line-through", color: "gray" },
   truckCapacity: { fontSize: 18, fontWeight: "500", marginTop: 10 },
   truckLocation: { fontSize: 18, marginTop: 5, color: "#007BFF" },
-  truckType: { fontSize: 18, marginTop: 5, fontWeight: "500" },
-  truckAvailability: { fontSize: 18, marginTop: 5, fontWeight: "bold", textAlign: "center" },
-  truckdescription: { fontSize: 18, fontWeight: "500", marginTop: 10 },
-  label: { fontSize: 16, fontWeight: "bold", marginTop: 15 },
+  truckType: { fontSize: 18, marginTop: 5 },
+  truckAvailability: { fontSize: 16, marginTop: 10, fontWeight: "500" },
+  bookButton: {
+    backgroundColor: "#0080FF", paddingVertical: 15, borderRadius: 5,
+    marginVertical: 20, alignItems: "center", justifyContent: "center"
+  },
+  bookButtonText: { color: "#fff", fontWeight: "bold", fontSize: 18 },
+  label: { fontSize: 16, fontWeight: "600", marginTop: 15 },
   inputBox: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: "#fff",
-    marginTop: 5,
+    backgroundColor: "#f1f1f1", padding: 15, borderRadius: 5, marginVertical: 5,
   },
-  bookButton: { backgroundColor: "#0080FF", padding: 15, borderRadius: 10, marginTop: 30, alignItems: "center" },
-  bookButtonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
-  errorText: { fontSize: 16, color: "red", textAlign: "center", marginTop: 20 },
-  modalContainer: { backgroundColor: "#fff", padding: 20, borderRadius: 10 },
-  modalMessage: { fontSize: 16, marginBottom: 15 },
-  modalButton: { backgroundColor: "#0080FF", padding: 12, borderRadius: 8, alignItems: "center" },
+  modalContainer: {
+    backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center",
+  },
+  modalMessage: { fontSize: 18, color: "#333", textAlign: "center" },
+  modalButton: {
+    backgroundColor: "#0080FF", paddingVertical: 15, borderRadius: 5, marginTop: 20, width: "80%",
+    alignItems: "center", justifyContent: "center"
+  },
   modalInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 15,
+    backgroundColor: "#f1f1f1", padding: 10, borderRadius: 5, marginVertical: 20, width: "80%",
   },
+  errorText: { textAlign: "center", color: "red", fontSize: 16, marginTop: 20 },
 });
 
 export default TruckDetails;
