@@ -7,7 +7,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = "http://192.168.1.41:5000";
+const API_URL = "http://192.168.1.36:5000";
 
 const EditTruck = () => {
   const router = useRouter();

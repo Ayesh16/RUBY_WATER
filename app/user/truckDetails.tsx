@@ -17,7 +17,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Modal from "react-native-modal";
 import Navbar from "@/components/Navbar";
 
-const API_URL = "http://192.168.1.41:5000";
+const API_URL = "http://192.168.1.36:5000";
 
 const TruckDetails = () => {
   const { id } = useLocalSearchParams();

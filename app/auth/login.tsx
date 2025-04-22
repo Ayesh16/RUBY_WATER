@@ -11,7 +11,7 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = "http://192.168.1.41:5000/auth/login";
+const API_URL = "http://192.168.1.36:5000/auth/login";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
