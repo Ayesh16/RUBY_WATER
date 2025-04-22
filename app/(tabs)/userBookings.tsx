@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  TouchableOpacity,
+  Switch,
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -72,11 +72,18 @@ const UserBookings = () => {
             : 'Not set'}
         </Text>
 
-        <TouchableOpacity onPress={() => toggleStatus(item._id)}>
-          <Text style={styles.viewStatusText}>
-            {isExpanded ? 'Hide Status' : 'View Status'}
+        {/* Toggle Switch for status */}
+        <View style={styles.toggleContainer}>
+          <Text style={styles.toggleLabel}>
+            {isExpanded ? 'Hide Status' : 'Show Status'}
           </Text>
-        </TouchableOpacity>
+          <Switch
+            value={isExpanded}
+            onValueChange={() => toggleStatus(item._id)}
+            thumbColor="#fff"
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+          />
+        </View>
 
         {isExpanded && (
           <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
@@ -166,11 +173,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 13,
   },
-  viewStatusText: {
+  toggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 10,
-    color: '#007bff',
-    fontWeight: '600',
+  },
+  toggleLabel: {
     fontSize: 15,
+    color: '#333',
+    marginRight: 10,
   },
   emptyText: {
     textAlign: 'center',
