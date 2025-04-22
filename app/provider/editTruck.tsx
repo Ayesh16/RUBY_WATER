@@ -6,6 +6,7 @@ import {
 import { useRouter, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Navbar from "@/components/Navbar";
 
 const API_URL = "http://192.168.1.36:5000";
 
@@ -102,7 +103,7 @@ const EditTruck = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><View style={styles.container}>
       <Text style={styles.heading}>Edit Truck</Text>
 
       {isLoading ? (
@@ -130,12 +131,12 @@ const EditTruck = () => {
           </TouchableOpacity>
         </ScrollView>
       )}
-    </View>
+    </View></>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20, alignItems: "center" },
+  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20, alignItems: "center" ,marginTop:100},
   scrollContainer: { width: "100%" },
   heading: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   input: {

@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import Navbar from "@/components/Navbar";
 
 const API_URL = "http://192.168.1.36:5000";
 
@@ -73,7 +74,7 @@ const AddTruck = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><View style={styles.container}>
       <Text style={styles.heading}>Add New Truck</Text>
 
       <TextInput placeholder="Truck Name" value={truckName} onChangeText={setTruckName} style={styles.input} />
@@ -88,12 +89,12 @@ const AddTruck = () => {
       <TouchableOpacity onPress={handleAddTruck} style={styles.addButton} disabled={loading}>
         {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.addButtonText}>Add Truck</Text>}
       </TouchableOpacity>
-    </View>
+    </View></>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20 },
+  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20,marginTop:100},
   heading: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
   input: { backgroundColor: "#FFF", padding: 10, marginBottom: 10, borderRadius: 5, borderWidth: 1, borderColor: "#CCC" },
   disabledInput: { backgroundColor: "#E0E0E0", color: "#888" },

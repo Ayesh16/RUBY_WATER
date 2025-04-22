@@ -38,9 +38,7 @@ const ProviderHome = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
-
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Banner */}
         <View style={styles.banner}>
@@ -59,25 +57,22 @@ const ProviderHome = () => {
               <TouchableOpacity
                 key={category._id}
                 style={styles.categoryCard}
-                onPress={() =>
-                  router.push(
-                    `/provider/categoryTrucks?category_id=${category._id}&category_name=${encodeURIComponent(
-                      category.name
-                    )}`
-                  )
-                }
+                onPress={() => router.push(
+                  `/provider/categoryTrucks?category_id=${category._id}&category_name=${encodeURIComponent(
+                    category.name
+                  )}`
+                )}
               >
                 <Image
                   source={{ uri: category.image || "https://via.placeholder.com/110" }}
-                  style={styles.categoryImage}
-                />
+                  style={styles.categoryImage} />
                 <Text style={styles.categoryText}>{category.name}</Text>
               </TouchableOpacity>
             ))}
           </View>
         )}
       </ScrollView>
-    </View>
+    </View></>
   );
 };
 
@@ -86,6 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F3F8FF",
     padding: 15,
+    marginTop:100
   },
   banner: {
     flexDirection: "row",

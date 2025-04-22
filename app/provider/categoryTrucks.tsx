@@ -121,9 +121,7 @@ const CategoryTruck = () => {
   
 
   return (
-    <View style={styles.container}>
-      <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
-
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><View style={styles.container}>
       <ScrollView>
         <Text style={styles.heading}>Your Trucks</Text>
 
@@ -155,12 +153,12 @@ const CategoryTruck = () => {
           <Text style={styles.addTruckButtonText}>Add Truck</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </View></>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 15 },
+  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 15,marginTop:100 },
   heading: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginVertical: 10 },
   noTruckText: { fontSize: 16, color: "#666", textAlign: "center", marginVertical: 10 },
   truckCard: {

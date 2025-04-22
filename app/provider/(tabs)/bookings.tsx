@@ -87,8 +87,7 @@ const ProviderBookings: React.FC = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-           <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><ScrollView style={styles.container}>
       <Text style={styles.header}>All Bookings</Text>
 
       <TouchableOpacity onPress={fetchBookings} style={{ alignSelf: "flex-end", marginBottom: 10 }}>
@@ -133,8 +132,7 @@ const ProviderBookings: React.FC = () => {
                   style={[
                     styles.statusButton,
                     {
-                      backgroundColor:
-                        status === booking.status ? "#ccc" : "#4CAF50",
+                      backgroundColor: status === booking.status ? "#ccc" : "#4CAF50",
                     },
                   ]}
                   onPress={() => updateStatus(booking._id, status)}
@@ -151,12 +149,12 @@ const ProviderBookings: React.FC = () => {
           </View>
         ))
       )}
-    </ScrollView>
+    </ScrollView></>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 15, backgroundColor: "#f2f2f2" },
+  container: { padding: 15, backgroundColor: "#f2f2f2" ,marginTop:100},
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
   header: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
   noBookings: { textAlign: "center", marginTop: 20, fontSize: 16 },
