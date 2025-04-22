@@ -10,6 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MotiView } from "moti";
 
 const API_URL = "http://192.168.1.36:5000/auth/login";
 
@@ -20,7 +21,6 @@ const Login: React.FC = () => {
 
   const router = useRouter();
 
-  // ✅ Store JWT Token & Owner ID securely
   const storeUserDetails = async (token: string, ownerId: string) => {
     try {
       await AsyncStorage.setItem("authToken", token);
@@ -31,7 +31,6 @@ const Login: React.FC = () => {
     }
   };
 
-  // ✅ Fetch User Data on Login
   const handleLogin = async () => {
     setLoading(true);
 
@@ -43,7 +42,7 @@ const Login: React.FC = () => {
       });
 
       const data = await response.json();
-      console.log("📌 Full API Response:", data); // Debug API response
+      console.log("📌 Full API Response:", data);
 
       if (!response.ok) {
         throw new Error(data.message || "Invalid credentials");
@@ -53,10 +52,8 @@ const Login: React.FC = () => {
         throw new Error("⚠️ Token or Owner ID missing in response!");
       }
 
-      // ✅ Store Token & Owner ID
       await storeUserDetails(data.token, data.owner_id);
 
-      // ✅ Confirm stored values
       const storedToken = await AsyncStorage.getItem("authToken");
       const storedOwnerId = await AsyncStorage.getItem("ownerId");
       console.log("📌 Stored Token:", storedToken);
@@ -68,10 +65,8 @@ const Login: React.FC = () => {
         text2: `Welcome back, ${data.name || "User"}!`,
       });
 
-      // ✅ Debugging: Log User Role
       console.log("📌 User Role:", data.role);
 
-      // ✅ Redirect User Based on Role
       setTimeout(() => {
         router.push(data.role === "provider" ? "/provider/providerhome" : "/home");
       }, 2000);
@@ -89,41 +84,47 @@ const Login: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <MotiView
+        from={{ opacity: 0, translateY: 50 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        transition={{ type: "timing", duration: 800 }}
+      >
+        <Text style={styles.title}>Login</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#4CAF50" />
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-      )}
+        {loading ? (
+          <ActivityIndicator size="large" color="#4CAF50" />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+        )}
 
-      <View style={styles.signupLinkContainer}>
-        <Text>New User?</Text>
-        <TouchableOpacity onPress={() => router.push("/auth/signup")}>
-          <Text style={styles.signupLink}> Register</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.signupLinkContainer}>
+          <Text>New User?</Text>
+          <TouchableOpacity onPress={() => router.push("/auth/signup")}>
+            <Text style={styles.signupLink}> Register</Text>
+          </TouchableOpacity>
+        </View>
 
-      <Toast />
+        <Toast />
+      </MotiView>
     </View>
   );
 };
