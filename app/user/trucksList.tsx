@@ -16,7 +16,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Navbar from "@/components/Navbar";
 
 const { width } = Dimensions.get("window");
-const API_BASE_URL = "http://192.168.1.36:5000"; // Backend API URL
+const API_BASE_URL = "http://192.168.154.73:5000"; // Backend API URL
 
 const TrucksList = () => {
   const router = useRouter();

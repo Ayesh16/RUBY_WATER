@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Navbar from '@/components/Navbar';
 
-const API_URL = 'http://192.168.1.36:5000'; // Change to your IP if testing on device
+const API_URL = 'http://192.168.154.73:5000'; // Change to your IP if testing on device
 
 const UserDetails = () => {
   const [name, setName] = useState('');
