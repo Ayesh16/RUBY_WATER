@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
-import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MotiView } from "moti";
 
@@ -59,12 +58,6 @@ const Login: React.FC = () => {
       console.log("📌 Stored Token:", storedToken);
       console.log("📌 Stored Owner ID:", storedOwnerId);
 
-      Toast.show({
-        type: "success",
-        text1: "Login Successful",
-        text2: `Welcome back, ${data.name || "User"}!`,
-      });
-
       console.log("📌 User Role:", data.role);
 
       setTimeout(() => {
@@ -72,11 +65,6 @@ const Login: React.FC = () => {
       }, 2000);
     } catch (error: any) {
       console.error("❌ Login Error:", error.message);
-      Toast.show({
-        type: "error",
-        text1: "Login Failed",
-        text2: error.message || "Something went wrong",
-      });
     } finally {
       setLoading(false);
     }
@@ -122,8 +110,6 @@ const Login: React.FC = () => {
             <Text style={styles.signupLink}> Register</Text>
           </TouchableOpacity>
         </View>
-
-        <Toast />
       </MotiView>
     </View>
   );
