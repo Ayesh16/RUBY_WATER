@@ -65,63 +65,72 @@ const Home = () => {
   return (
     <View style={styles.container}>
       <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
-
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Offer Image Slider */}
-        <View style={styles.carouselContainer}>
-          <Carousel
-            width={width}
-            height={200}
-            data={offers}
-            autoPlay={true}
-            loop
-            scrollAnimationDuration={1000}
-            renderItem={({ item }) => (
-              <Image source={{ uri: item.image }} style={styles.offerImage} />
-            )}
-          />
-        </View>
-
-        {/* Categories Section */}
-        <Text style={styles.sectionTitle}>💦 Choose Your Water Service</Text>
-        {loading ? (
-          <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
-        ) : (
-          <FlatList
-            data={categories}
-            numColumns={2}
-            columnWrapperStyle={styles.categoryGrid}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.categoryCard}
-                onPress={() => handleCategoryPress(item._id, item.name)}
-                activeOpacity={0.8}
-              >
-                <Image source={{ uri: item.image }} style={styles.categoryImage} />
-                <Text style={styles.categoryText}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        )}
-
-        {/* Popular Trucks Section */}
-        <Text style={styles.sectionTitle}>🔥 Popular Water Trucks</Text>
+  
+      {loading ? (
+        <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
+      ) : (
         <FlatList
-          data={popularTrucks}
-          horizontal
-          showsHorizontalScrollIndicator={false}
+          data={categories}
+          numColumns={2}
+          columnWrapperStyle={styles.categoryGrid}
           keyExtractor={(item) => item._id}
+          ListHeaderComponent={
+            <>
+              {/* Offer Banner */}
+              <View style={styles.carouselContainer}>
+                <Carousel
+                  width={width}
+                  height={200}
+                  data={offers}
+                  autoPlay
+                  loop
+                  scrollAnimationDuration={1000}
+                  renderItem={({ item }) => (
+                    <Image source={{ uri: item.image }} style={styles.offerImage} />
+                  )}
+                />
+              </View>
+  
+              {/* Categories Title */}
+              <Text style={styles.sectionTitle}>💦 Choose Your Water Service</Text>
+            </>
+          }
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.popularTruckCard}>
-              <Image source={{ uri: item.image }} style={styles.popularTruckImage} />
-              <Text style={styles.popularTruckText}>{item.truck_name}</Text>
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleCategoryPress(item._id, item.name)}
+              activeOpacity={0.8}
+            >
+              <Image source={{ uri: item.image }} style={styles.categoryImage} />
+              <Text style={styles.categoryText}>{item.name}</Text>
             </TouchableOpacity>
           )}
+          ListFooterComponent={
+            <>
+              {/* Popular Trucks Title */}
+              <Text style={styles.sectionTitle}>🔥 Popular Water Trucks</Text>
+  
+              {/* Popular Trucks List */}
+              <FlatList
+                data={popularTrucks}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item) => item._id}
+                contentContainerStyle={{ paddingHorizontal: 10 }}
+                renderItem={({ item }) => (
+                  <TouchableOpacity style={styles.popularTruckCard}>
+                    <Image source={{ uri: item.image }} style={styles.popularTruckImage} />
+                    <Text style={styles.popularTruckText}>{item.truck_name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </>
+          }
         />
-      </ScrollView>
+      )}
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
