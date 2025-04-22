@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Navbar from '@/components/Navbar';
 
 const API_URL = 'http://192.168.1.36:5000';
 
@@ -87,28 +88,48 @@ const UserBookings = () => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#007BFF" style={{ marginTop: 40 }} />;
+    return (
+      <View style={styles.container}>
+        <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+        <ActivityIndicator size="large" color="#007BFF" style={{ marginTop: 40 }} />
+      </View>
+    );
   }
 
   if (bookings.length === 0) {
     return (
-      <Text style={styles.emptyText}>📝 You haven’t booked any trucks yet.</Text>
+      <View style={styles.container}>
+        <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+        <Text style={styles.emptyText}>📝 You haven’t booked any trucks yet.</Text>
+      </View>
     );
   }
 
   return (
-    <FlatList
-      data={bookings}
-      keyExtractor={(item) => item._id}
-      renderItem={renderBooking}
-      refreshing={loading}
-      onRefresh={fetchUserBookings}
-      contentContainerStyle={{ padding: 15 }}
-    />
+    <View style={styles.container}>
+      <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+      <FlatList
+        data={bookings}
+        keyExtractor={(item) => item._id}
+        renderItem={renderBooking}
+        refreshing={loading}
+        onRefresh={fetchUserBookings}
+        contentContainerStyle={styles.listContent}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 100, // Adjust this to fit *under* the Navbar
+    backgroundColor: '#f8f9fa',
+  },
+  listContent: {
+    paddingHorizontal: 15,
+    paddingBottom: 20,
+  },
   card: {
     backgroundColor: '#fff',
     padding: 18,
