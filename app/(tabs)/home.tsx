@@ -135,7 +135,7 @@ const Home = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F5F5F5" },
-  carouselContainer: { marginTop: 18, alignItems: "center" },
+  carouselContainer: { marginTop: 100, alignItems: "center" },
   offerImage: { width: width * 0.9, height: 200, borderRadius: 15, resizeMode: "cover" },
   sectionTitle: { fontSize: 22, fontWeight: "700", marginTop: 20, textAlign: "center", color: "#333" },
   categoryGrid: { 

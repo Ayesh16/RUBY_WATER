@@ -89,8 +89,9 @@ const UserDetails = () => {
   }
 
   return (
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
     <View style={styles.container}>
-         <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+
       <Text style={styles.label}>Email:</Text>
       <Text style={styles.value}>{email}</Text>
 
@@ -129,19 +130,20 @@ const UserDetails = () => {
             setPhone(originalPhone);
             setAddress(originalAddress);
             setEditing(false);
-          }}
+          } }
           style={[styles.button, styles.cancelButton]}
         >
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </View></>
   );
 };
 
 const styles = StyleSheet.create({
     container: {
       padding: 24,
+      marginTop:100,
       backgroundColor: '#f9fafb',
       flex: 1,
     },

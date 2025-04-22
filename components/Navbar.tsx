@@ -4,7 +4,6 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import Toast from "react-native-toast-message";
 
 interface NavbarProps {
   isLoggedIn: boolean;
@@ -16,16 +15,6 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
 
   const handleLogout = () => {
     onLogout();
-
-    Toast.show({
-      type: "success",
-      text1: "Logged Out",
-      text2: "You have successfully logged out!",
-      position: "top",
-      visibilityTime: 2000,
-      autoHide: true,
-    });
-
     setTimeout(() => {
       router.push("/auth/login");
     }, 2000);
@@ -53,7 +42,6 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
           </TouchableOpacity>
         )}
       </View>
-      <Toast />
     </View>
   );
 };
@@ -66,6 +54,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
+    position: "absolute",  // Fixed at the top
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,  // Make sure it stays on top of other elements
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,

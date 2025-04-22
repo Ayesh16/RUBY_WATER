@@ -127,8 +127,7 @@ const TruckDetails = () => {
   if (!truck) return <Text style={styles.errorText}>Truck details not found.</Text>;
 
   return (
-    <ScrollView style={styles.container}>
-      <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><ScrollView style={styles.container}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: truck.truck_image }} style={styles.truckImage} />
       </View>
@@ -180,9 +179,8 @@ const TruckDetails = () => {
               onConfirm={(date) => {
                 setDeliveryDate(date);
                 setDatePickerVisibility(false);
-              }}
-              onCancel={() => setDatePickerVisibility(false)}
-            />
+              } }
+              onCancel={() => setDatePickerVisibility(false)} />
 
             <TouchableOpacity style={[styles.bookButton, { backgroundColor: "#28A745" }]} onPress={handleConfirmBooking}>
               <Text style={styles.bookButtonText}>Confirm Booking</Text>
@@ -210,25 +208,24 @@ const TruckDetails = () => {
             onChangeText={setInputValue}
             placeholder={inputLabel}
             style={styles.modalInput}
-            keyboardType={inputLabel.toLowerCase().includes("phone") ? "phone-pad" : "default"}
-          />
+            keyboardType={inputLabel.toLowerCase().includes("phone") ? "phone-pad" : "default"} />
           <TouchableOpacity
             style={[styles.modalButton, { backgroundColor: "#28A745" }]}
             onPress={() => {
               setInputModalVisible(false);
               onInputConfirm(inputValue);
-            }}
+            } }
           >
             <Text style={{ color: "#fff", fontWeight: "bold" }}>Confirm</Text>
           </TouchableOpacity>
         </View>
       </Modal>
-    </ScrollView>
+    </ScrollView></>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA" },
+  container: { flex: 1, backgroundColor: "#FAFAFA",marginTop:100 },
   imageContainer: { backgroundColor: "#fff", padding: 15, alignItems: "center" },
   truckImage: { width: "90%", height: 280, borderRadius: 10, resizeMode: "cover" },
   detailsCard: {

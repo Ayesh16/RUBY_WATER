@@ -51,10 +51,8 @@ const TrucksList = () => {
   };
 
   return (
-    <View style={styles.container}>
-       <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><View style={styles.container}>
       <Text style={styles.title}>🚛 Trucks for {categoryName}</Text>
-
       {loading ? (
         <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
       ) : trucks.length === 0 ? (
@@ -72,8 +70,7 @@ const TrucksList = () => {
             >
               <Image
                 source={{ uri: item.truck_image || "https://via.placeholder.com/150" }}
-                style={styles.truckImage}
-              />
+                style={styles.truckImage} />
               <Text style={styles.truckName}>{item.truck_name}</Text>
 
               {/* Price & Ratings */}
@@ -93,15 +90,14 @@ const TrucksList = () => {
                 <Text style={styles.bookNowText}>View Details</Text>
               </TouchableOpacity>
             </TouchableOpacity>
-          )}
-        />
+          )} />
       )}
-    </View>
+    </View></>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F5F5", padding: 15 },
+  container: { flex: 1, backgroundColor: "#F5F5F5", padding: 15 ,marginTop:100},
   title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 15, color: "#333" },
   noTrucksText: { fontSize: 18, fontWeight: "bold", textAlign: "center", color: "red", marginTop: 20 },
 
