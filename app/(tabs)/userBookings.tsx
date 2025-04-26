@@ -12,7 +12,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '@/components/Navbar';
 
-const API_URL = 'http://192.168.1.39:5000';
+const API_URL = 'http://localhost:5000';
 
 const UserBookings = () => {
   const [bookings, setBookings] = useState<any[]>([]);

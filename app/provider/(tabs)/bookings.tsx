@@ -12,7 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, { FadeIn, FadeOut, Layout } from "react-native-reanimated";
 import Navbar from "@/components/Navbar";
 
-const API_URL = "http://192.168.1.39:5000/bookings"; // Replace with your LAN IP
+const API_URL = "http://localhost:5000/bookings"; // Replace with your LAN IP
 
 type Booking = {
   _id: string;

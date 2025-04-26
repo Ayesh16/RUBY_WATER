@@ -11,7 +11,7 @@ import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MotiView } from "moti";
 
-const API_URL = "http://192.168.1.39:5000/auth/login";
+const API_URL = "http://localhost:5000/auth/login";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
