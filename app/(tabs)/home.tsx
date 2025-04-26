@@ -92,7 +92,7 @@ const Home = () => {
               </View>
   
               {/* Categories Title */}
-              <Text style={styles.sectionTitle}>💦 Choose Your Water Service</Text>
+              <Text style={styles.sectionTitle}>Choose Your Water Service</Text>
             </>
           }
           renderItem={({ item }) => (
