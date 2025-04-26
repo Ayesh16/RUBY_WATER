@@ -79,17 +79,17 @@ const TruckDetails = () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       const userId = await AsyncStorage.getItem("ownerId");
-
+  
       if (!token || !userId) {
         alert("Authentication required.");
         return;
       }
-
+  
       if (!address || !phoneNumber || !deliveryDate) {
         alert("Please fill all booking details.");
         return;
       }
-
+  
       const bookingPayload = {
         truck_id: id,
         customer_id: userId,
@@ -97,28 +97,42 @@ const TruckDetails = () => {
         phone: phoneNumber,
         delivery_time: deliveryDate.toISOString(),
       };
-
+  
+      // Make the booking request and log the response
       const response = await axios.post(`${API_URL}/bookings`, bookingPayload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-
+      
+      console.log("Booking Response:", response.data);
+      
+      const booking_id = response.data.booking_id; // <-- Corrected here
+      
+      console.log("Booking ID:", booking_id);
+      
+      if (!booking_id) {
+        alert("Booking ID not received.");
+        return;
+      }
+      
       setShowBookingForm(false);
+      
       router.push({
         pathname: "/payments/checkout",
         params: {
-          booking_id: response.data._id,
+          booking_id,
           user_id: userId,
-          amount: truck.price,
+          amount: truck.price.toString(),
         },
-      });
+      });      
     } catch (error: any) {
       console.error("❌ Booking failed:", error.response?.data || error.message);
       alert("Booking failed. Something went wrong.");
     }
   };
+  
 
   if (loading) return <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />;
   if (!truck) return <Text style={styles.errorText}>Truck details not found.</Text>;
