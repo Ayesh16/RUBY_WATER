@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, Image,
-  StyleSheet, ActivityIndicator, Alert, ScrollView
+  StyleSheet, ActivityIndicator, Alert, ScrollView, Switch
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import axios from "axios";
@@ -20,7 +20,8 @@ const EditTruck = () => {
   const [location, setLocation] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
   const [imageUri, setImageUri] = useState("");
-  const [price, setPrice] = useState(""); // ✅ New
+  const [price, setPrice] = useState("");
+  const [available, setAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -41,7 +42,6 @@ const EditTruck = () => {
         return;
       }
 
-      console.log("🚛 Fetching details for truckId:", truckId);
       const response = await axios.get(`${API_URL}/trucks/${truckId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -53,7 +53,8 @@ const EditTruck = () => {
       setLocation(truckData.location);
       setCategoryDescription(truckData.category_description);
       setImageUri(truckData.truck_image || "");
-      setPrice(String(truckData.price || "")); // ✅ Load existing price
+      setPrice(String(truckData.price || ""));
+      setAvailable(truckData.available || false);
     } catch (error) {
       console.error("❌ Error fetching truck details:", error);
       Alert.alert("Error", "Failed to load truck details.");
@@ -85,7 +86,8 @@ const EditTruck = () => {
           location,
           category_description: categoryDescription,
           truck_image: imageUri,
-          price: Number(price), // ✅ Include price
+          price: Number(price),
+          available,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -103,40 +105,61 @@ const EditTruck = () => {
   };
 
   return (
-    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><View style={styles.container}>
-      <Text style={styles.heading}>Edit Truck</Text>
+    <>
+      <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+      <View style={styles.container}>
+        <Text style={styles.heading}>Edit Truck</Text>
 
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
-      ) : (
-        <ScrollView style={styles.scrollContainer}>
-          <TextInput style={styles.input} placeholder="Truck Name" value={truckName} onChangeText={setTruckName} />
-          <TextInput style={styles.input} placeholder="Capacity (Liters)" value={capacity} onChangeText={setCapacity} keyboardType="numeric" />
-          <TextInput style={styles.input} placeholder="Truck Type (e.g., Large, Small)" value={truckType} onChangeText={setTruckType} />
-          <TextInput style={styles.input} placeholder="Location" value={location} onChangeText={setLocation} />
-          <TextInput style={styles.input} placeholder="Category Description" value={categoryDescription} onChangeText={setCategoryDescription} />
-          <TextInput style={styles.input} placeholder="Truck Image URL" value={imageUri} onChangeText={setImageUri} />
-          <TextInput style={styles.input} placeholder="Price (₹)" value={price} onChangeText={setPrice} keyboardType="numeric" /> {/* ✅ Price input */}
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />
+        ) : (
+          <ScrollView style={styles.scrollContainer}>
+            <TextInput style={styles.input} placeholder="Truck Name" value={truckName} onChangeText={setTruckName} />
+            <TextInput style={styles.input} placeholder="Capacity (Liters)" value={capacity} onChangeText={setCapacity} keyboardType="numeric" />
+            <TextInput style={styles.input} placeholder="Truck Type (e.g., Large, Small)" value={truckType} onChangeText={setTruckType} />
+            <TextInput style={styles.input} placeholder="Location" value={location} onChangeText={setLocation} />
+            <TextInput style={styles.input} placeholder="Category Description" value={categoryDescription} onChangeText={setCategoryDescription} />
+            <TextInput style={styles.input} placeholder="Truck Image URL" value={imageUri} onChangeText={setImageUri} />
+            <TextInput style={styles.input} placeholder="Price (₹)" value={price} onChangeText={setPrice} keyboardType="numeric" />
+            
+            {/* 🚛 Availability Switch */}
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabel}>Available:</Text>
+              <Switch
+                value={available}
+                onValueChange={setAvailable}
+                trackColor={{ false: "#ccc", true: "#4CD964" }}
+                thumbColor={available ? "#fff" : "#f4f3f4"}
+                ios_backgroundColor="#ccc"
+              />
+            </View>
 
-          {imageUri ? (
-            <Image source={{ uri: imageUri }} style={styles.image} />
-          ) : (
-            <Text style={styles.imagePlaceholder}>Enter a valid image URL</Text>
-          )}
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={styles.image} />
+            ) : (
+              <Text style={styles.imagePlaceholder}>Enter a valid image URL</Text>
+            )}
 
-          <TouchableOpacity style={styles.updateButton} onPress={handleUpdateTruck} disabled={isUpdating}>
-            <Text style={styles.updateButtonText}>
-              {isUpdating ? "Updating..." : "Update Truck"}
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      )}
-    </View></>
+            <TouchableOpacity style={styles.updateButton} onPress={handleUpdateTruck} disabled={isUpdating}>
+              <Text style={styles.updateButtonText}>
+                {isUpdating ? "Updating..." : "Update Truck"}
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        )}
+      </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20, alignItems: "center" ,marginTop:100},
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+    padding: 20,
+    alignItems: "center",
+    marginTop: 100,
+  },
   scrollContainer: { width: "100%" },
   heading: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   input: {
@@ -149,8 +172,34 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginBottom: 10,
   },
-  image: { width: 120, height: 120, borderRadius: 10, marginVertical: 10 },
-  imagePlaceholder: { fontSize: 14, color: "#666", marginBottom: 10 },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  imagePlaceholder: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 10,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  switchLabel: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#333",
+  },
   updateButton: {
     backgroundColor: "#0080FF",
     padding: 10,
