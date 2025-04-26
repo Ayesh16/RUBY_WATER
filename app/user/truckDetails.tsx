@@ -7,14 +7,13 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
-  Platform,
   TextInput,
+  Alert,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import Modal from "react-native-modal";
 import Navbar from "@/components/Navbar";
 
 const API_URL = "http://192.168.1.39:5000";
@@ -25,31 +24,25 @@ const TruckDetails = () => {
   const [loading, setLoading] = useState(true);
 
   const [showBookingForm, setShowBookingForm] = useState(false);
-  const [address, setAddress] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [deliveryDate, setDeliveryDate] = useState<Date>(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  const [modalMessage, setModalMessage] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [inputModalVisible, setInputModalVisible] = useState(false);
-  const [inputLabel, setInputLabel] = useState("");
-  const [inputValue, setInputValue] = useState("");
-  const [onInputConfirm, setOnInputConfirm] = useState<(val: string) => void>(() => {});
-
   useEffect(() => {
     if (!id) {
-      showMessage("No truck ID provided.");
+      alert("No truck ID provided.");
       return;
     }
     fetchTruckDetails();
+    fetchUserDetails();
   }, [id]);
 
   const fetchTruckDetails = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
-        showMessage("You need to log in.");
+        alert("You need to log in.");
         return;
       }
 
@@ -60,9 +53,25 @@ const TruckDetails = () => {
       setTruck(response.data);
     } catch (error) {
       console.error("❌ Error fetching truck details:", error);
-      showMessage("Could not load truck details.");
+      alert("Could not load truck details.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserDetails = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) return;
+
+      const res = await axios.get(`${API_URL}/auth/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setAddress(res.data.address || "");
+      setPhoneNumber(res.data.phone || "");
+    } catch (error) {
+      console.error("❌ Error fetching user details:", error);
     }
   };
 
@@ -72,12 +81,12 @@ const TruckDetails = () => {
       const userId = await AsyncStorage.getItem("ownerId");
 
       if (!token || !userId) {
-        showMessage("Authentication required.");
+        alert("Authentication required.");
         return;
       }
 
       if (!address || !phoneNumber || !deliveryDate) {
-        showMessage("Please fill all booking details.");
+        alert("Please fill all booking details.");
         return;
       }
 
@@ -95,137 +104,98 @@ const TruckDetails = () => {
           "Content-Type": "application/json",
         },
       });
+
       setShowBookingForm(false);
       router.push({
         pathname: "/payments/checkout",
         params: {
-          booking_id: response.data._id, // Assuming booking ID is returned
+          booking_id: response.data._id,
           user_id: userId,
           amount: truck.price,
         },
       });
-      
     } catch (error: any) {
       console.error("❌ Booking failed:", error.response?.data || error.message);
-      showMessage("Booking failed. Something went wrong.");
+      alert("Booking failed. Something went wrong.");
     }
-  };
-
-  const showMessage = (msg: string) => {
-    setModalMessage(msg);
-    setIsModalVisible(true);
-  };
-
-  const openInputModal = (label: string, value: string, onConfirm: (val: string) => void) => {
-    setInputLabel(label);
-    setInputValue(value);
-    setOnInputConfirm(() => onConfirm);
-    setInputModalVisible(true);
   };
 
   if (loading) return <ActivityIndicator size="large" color="#0080FF" style={{ marginTop: 20 }} />;
   if (!truck) return <Text style={styles.errorText}>Truck details not found.</Text>;
 
   return (
-    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><ScrollView style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: truck.truck_image }} style={styles.truckImage} />
-      </View>
-
-      <View style={styles.detailsCard}>
-        <Text style={styles.truckName}>{truck.truck_name}</Text>
-        <Text style={styles.price}>
-          ₹{truck.price} <Text style={styles.discount}>{truck.original_price}</Text>
-        </Text>
-        <Text style={styles.truckDescription}>Description: {truck.category_description}</Text>
-        <Text style={styles.truckCapacity}>💧 Capacity: {truck.capacity} Liters</Text>
-        <Text style={styles.truckLocation}>📍 Location: {truck.location}</Text>
-        <Text style={styles.truckType}>🚛 Type: {truck.truck_type}</Text>
-        <Text style={[styles.truckAvailability, { color: truck.available ? "green" : "red" }]}>
-          {truck.available ? "✅ Available" : "❌ Not Available"}
-        </Text>
-
-        {!showBookingForm ? (
-          <TouchableOpacity style={styles.bookButton} onPress={() => setShowBookingForm(true)}>
-            <Text style={styles.bookButtonText}>Book Now</Text>
-          </TouchableOpacity>
-        ) : (
-          <>
-            <Text style={styles.label}>📍 Address</Text>
-            <TouchableOpacity
-              style={styles.inputBox}
-              onPress={() => openInputModal("Enter your address", address, setAddress)}
-            >
-              <Text>{address || "Tap to enter address"}</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.label}>📞 Phone Number</Text>
-            <TouchableOpacity
-              style={styles.inputBox}
-              onPress={() => openInputModal("Enter your phone number", phoneNumber, setPhoneNumber)}
-            >
-              <Text>{phoneNumber || "Tap to enter phone number"}</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.label}>📅 Delivery Date & Time</Text>
-            <TouchableOpacity onPress={() => setDatePickerVisibility(true)} style={styles.inputBox}>
-              <Text>{deliveryDate.toLocaleString()}</Text>
-            </TouchableOpacity>
-
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="datetime"
-              date={deliveryDate}
-              onConfirm={(date) => {
-                setDeliveryDate(date);
-                setDatePickerVisibility(false);
-              } }
-              onCancel={() => setDatePickerVisibility(false)} />
-
-            <TouchableOpacity style={[styles.bookButton, { backgroundColor: "#28A745" }]} onPress={handleConfirmBooking}>
-              <Text style={styles.bookButtonText}>Confirm Booking</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
-
-      {/* Success/Error Modal */}
-      <Modal isVisible={isModalVisible} onBackdropPress={() => setIsModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalMessage}>{modalMessage}</Text>
-          <TouchableOpacity style={styles.modalButton} onPress={() => setIsModalVisible(false)}>
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>OK</Text>
-          </TouchableOpacity>
+    <>
+      <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+      <ScrollView style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: truck.truck_image }} style={styles.truckImage} />
         </View>
-      </Modal>
 
-      {/* Input Modal */}
-      <Modal isVisible={inputModalVisible} onBackdropPress={() => setInputModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalMessage}>{inputLabel}</Text>
-          <TextInput
-            value={inputValue}
-            onChangeText={setInputValue}
-            placeholder={inputLabel}
-            style={styles.modalInput}
-            keyboardType={inputLabel.toLowerCase().includes("phone") ? "phone-pad" : "default"} />
-          <TouchableOpacity
-            style={[styles.modalButton, { backgroundColor: "#28A745" }]}
-            onPress={() => {
-              setInputModalVisible(false);
-              onInputConfirm(inputValue);
-            } }
-          >
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>Confirm</Text>
-          </TouchableOpacity>
+        <View style={styles.detailsCard}>
+          <Text style={styles.truckName}>{truck.truck_name}</Text>
+          <Text style={styles.price}>
+            ₹{truck.price} <Text style={styles.discount}>{truck.original_price}</Text>
+          </Text>
+          <Text style={styles.truckDescription}>Description: {truck.category_description}</Text>
+          <Text style={styles.truckCapacity}>💧 Capacity: {truck.capacity} Liters</Text>
+          <Text style={styles.truckLocation}>📍 Location: {truck.location}</Text>
+          <Text style={styles.truckType}>🚛 Type: {truck.truck_type}</Text>
+          <Text style={[styles.truckAvailability, { color: truck.available ? "green" : "red" }]}>
+            {truck.available ? "✅ Available" : "❌ Not Available"}
+          </Text>
+
+          {!showBookingForm ? (
+            <TouchableOpacity style={styles.bookButton} onPress={() => setShowBookingForm(true)}>
+              <Text style={styles.bookButtonText}>Book Now</Text>
+            </TouchableOpacity>
+          ) : (
+            <>
+              <Text style={styles.label}>📍 Address</Text>
+              <TextInput
+                value={address}
+                onChangeText={setAddress}
+                placeholder="Enter your address"
+                style={styles.inputBox}
+              />
+
+              <Text style={styles.label}>📞 Phone Number</Text>
+              <TextInput
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholder="Enter your phone number"
+                style={styles.inputBox}
+                keyboardType="phone-pad"
+              />
+
+              <Text style={styles.label}>📅 Delivery Date & Time</Text>
+              <TouchableOpacity onPress={() => setDatePickerVisibility(true)} style={styles.inputBox}>
+                <Text>{deliveryDate.toLocaleString()}</Text>
+              </TouchableOpacity>
+
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="datetime"
+                date={deliveryDate}
+                onConfirm={(date) => {
+                  setDeliveryDate(date);
+                  setDatePickerVisibility(false);
+                }}
+                onCancel={() => setDatePickerVisibility(false)}
+              />
+
+              <TouchableOpacity style={[styles.bookButton, { backgroundColor: "#28A745" }]} onPress={handleConfirmBooking}>
+                <Text style={styles.bookButtonText}>Confirm Booking</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
-      </Modal>
-    </ScrollView></>
+      </ScrollView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA",marginTop:100 },
+  container: { flex: 1, backgroundColor: "#FAFAFA", marginTop: 100 },
   imageContainer: { backgroundColor: "#fff", padding: 15, alignItems: "center" },
   truckImage: { width: "90%", height: 280, borderRadius: 10, resizeMode: "cover" },
   detailsCard: {
@@ -250,18 +220,7 @@ const styles = StyleSheet.create({
   inputBox: {
     backgroundColor: "#f1f1f1", padding: 15, borderRadius: 5, marginVertical: 5,
   },
-  modalContainer: {
-    backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center",
-  },
-  modalMessage: { fontSize: 18, color: "#333", textAlign: "center" },
-  modalButton: {
-    backgroundColor: "#0080FF", paddingVertical: 15, borderRadius: 5, marginTop: 20, width: "80%",
-    alignItems: "center", justifyContent: "center"
-  },
-  modalInput: {
-    backgroundColor: "#f1f1f1", padding: 10, borderRadius: 5, marginVertical: 20, width: "80%",
-  },
-  errorText: { textAlign: "center", color: "red", fontSize: 16, marginTop: 20 },
+  errorText: { color: "red", textAlign: "center", marginTop: 20 },
 });
 
 export default TruckDetails;
