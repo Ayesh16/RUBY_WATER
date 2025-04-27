@@ -1,23 +1,23 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import Navbar from "@/components/Navbar";
 
 const BookingSuccess = () => {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
+    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} /><View style={styles.container}>
       <Image
         source={require("../../assets/images/success.png")} // use a success image or emoji
-        style={styles.image}
-      />
+        style={styles.image} />
       <Text style={styles.title}>Booking Confirmed! 🎉</Text>
       <Text style={styles.message}>Your water truck will arrive as scheduled.</Text>
 
       <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/userBookings")}>
         <Text style={styles.buttonText}>Go to My Bookings</Text>
       </TouchableOpacity>
-    </View>
+    </View></>
   );
 };
 
