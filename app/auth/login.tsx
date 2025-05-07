@@ -62,7 +62,10 @@ const Login: React.FC = () => {
       await storeUserDetails(token, owner_id, role);
 
       // Navigate based on role
-      if (role === "provider") {
+      if (role === "admin") {
+        console.log("Redirecting to admin page...");
+        router.replace("/admin/adminhome");
+      } else if (role === "provider") {
         router.replace("/provider/providerhome");
       } else {
         router.replace("/home");
@@ -115,8 +118,6 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,3 +162,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
+export default Login;
