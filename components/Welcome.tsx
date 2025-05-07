@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    width: '100%', // Full width
+    width: '110%', // Full width
     height: '65%', // Full height
     resizeMode: 'cover', // Ensure the image covers the screen
   },
