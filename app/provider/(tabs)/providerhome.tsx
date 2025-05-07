@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F3F8FF",
     padding: 15,
-    marginTop:100
+    marginTop:70
   },
   banner: {
     flexDirection: "row",

@@ -80,40 +80,45 @@ const Login: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 200 }}>
+      <MotiView
+        from={{ opacity: 0, translateY: 20 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        transition={{ delay: 200, type: "timing" }}
+        style={styles.card}
+      >
         <Text style={styles.title}>Login</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          onChangeText={setEmail}
+          value={email}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+          onChangeText={setPassword}
+          value={password}
+        />
+
+        {loading ? (
+          <ActivityIndicator size="large" color="blue" />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+        )}
+
+        <View style={styles.signupLinkContainer}>
+          <Text>Don't have an account?</Text>
+          <TouchableOpacity onPress={() => router.push("/auth/signup")}>
+            <Text style={styles.signupLink}> Sign Up</Text>
+          </TouchableOpacity>
+        </View>
       </MotiView>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        onChangeText={setEmail}
-        value={email}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        onChangeText={setPassword}
-        value={password}
-      />
-
-      {loading ? (
-        <ActivityIndicator size="large" color="blue" />
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-      )}
-
-      <View style={styles.signupLinkContainer}>
-        <Text>Don't have an account?</Text>
-        <TouchableOpacity onPress={() => router.push("/auth/signup")}>
-          <Text style={styles.signupLink}> Sign Up</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -123,7 +128,19 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f2f2f2", // light background
+  },
+  card: {
     backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 24,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6, // Android shadow
   },
   title: {
     fontSize: 32,
