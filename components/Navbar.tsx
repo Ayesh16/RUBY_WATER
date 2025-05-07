@@ -7,9 +7,10 @@ import {
   TextInput,
   Text,
   Modal,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 interface NavbarProps {
   isLoggedIn: boolean;
@@ -19,8 +20,10 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
   const router = useRouter();
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const handleLogout = () => {
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
     setDropdownVisible(false);
     onLogout();
     setTimeout(() => {
@@ -40,16 +43,19 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
 
       {/* Search */}
       <View style={styles.searchBar}>
-        <FontAwesome name="search" size={20} color="gray" style={styles.searchIcon} />
+        <FontAwesome
+          name="search"
+          size={20}
+          color="gray"
+          style={styles.searchIcon}
+        />
         <TextInput placeholder="Search Services..." style={styles.searchInput} />
       </View>
 
       {/* User Icon */}
       <View style={styles.userSection}>
         {isLoggedIn && (
-          <TouchableOpacity
-            onPress={() => setDropdownVisible(!dropdownVisible)}
-          >
+          <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>
             <FontAwesome name="user-circle-o" size={28} color="black" />
           </TouchableOpacity>
         )}
@@ -65,12 +71,45 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, onLogout }) => {
             >
               <Text style={styles.dropdownText}>Profile</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.dropdownItem} onPress={handleLogout}>
+
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => setShowLogoutModal(true)}
+            >
               <Text style={styles.dropdownText}>Logout</Text>
             </TouchableOpacity>
           </View>
         )}
       </View>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        transparent
+        visible={showLogoutModal}
+        animationType="fade"
+        onRequestClose={() => setShowLogoutModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Confirm Logout</Text>
+            <Text style={styles.modalMessage}>Are you sure you want to logout?</Text>
+            <View style={styles.modalActions}>
+              <Pressable
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => setShowLogoutModal(false)}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.confirmButton]}
+                onPress={confirmLogout}
+              >
+                <Text style={styles.buttonText}>Logout</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -145,6 +184,51 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 16,
     color: "#111827",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    padding: 25,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 6,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: "#ccc",
+  },
+  confirmButton: {
+    backgroundColor: "#f87171",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });
 
