@@ -18,7 +18,7 @@ import Carousel from "react-native-reanimated-carousel";
 
 const { width } = Dimensions.get("window");
 
-const API_BASE_URL = "http://localhost:5000"; // Change to your backend URL
+const API_BASE_URL = "http://192.168.131.73:5000"; // Change to your backend URL
 
 const Home = () => {
   const router = useRouter();

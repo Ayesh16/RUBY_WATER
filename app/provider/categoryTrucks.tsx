@@ -8,7 +8,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Navbar from "@/components/Navbar";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "http://192.168.131.73:5000";
 
 interface Truck {
   _id: string;

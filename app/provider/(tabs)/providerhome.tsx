@@ -13,7 +13,7 @@ import Navbar from "@/components/Navbar";
 import axios from "axios";
 import { AntDesign } from "@expo/vector-icons"; // For icon in banner
 
-const API_URL = "http://localhost:5000/categories"; // Replace with your IP on device testing
+const API_URL = "http://192.168.131.73:5000/categories"; // Replace with your IP on device testing
 
 const ProviderHome = () => {
   const router = useRouter();
