@@ -13,7 +13,7 @@ import Animated, { FadeIn, FadeOut, Layout } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import Navbar from "@/components/Navbar";
 
-const API_URL = "http://192.168.131.73:5000/bookings";
+const API_URL = "http://192.168.161.73:5000/bookings";
 
 type Booking = {
   _id: string;
@@ -33,6 +33,13 @@ const STATUS_COLORS: Record<string, string> = {
   Delivered: "#4CAF50",
 };
 
+const statusPriority: Record<string, number> = {
+  Pending: 1,
+  Confirmed: 2,
+  Delivered: 3,
+  Cancelled: 4,
+};
+
 const ProviderBookings: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
@@ -49,8 +56,21 @@ const ProviderBookings: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const data = await res.json();
-      setBookings(data);
+      const data: Booking[] = await res.json();
+
+      // Sort by delivery_time (newest first)
+      const sorted = data.sort((a, b) => {
+        const dateA = a.delivery_time ? new Date(a.delivery_time).getTime() : 0;
+        const dateB = b.delivery_time ? new Date(b.delivery_time).getTime() : 0;
+        return dateB - dateA;
+      });
+
+      // Optional: sort by status priority instead
+      // const sorted = data.sort((a, b) => {
+      //   return (statusPriority[a.status] || 99) - (statusPriority[b.status] || 99);
+      // });
+
+      setBookings(sorted);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch bookings.");
     } finally {

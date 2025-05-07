@@ -16,7 +16,7 @@ import axios from 'axios';
 import Navbar from '@/components/Navbar';
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 
-const API_URL = 'http://192.168.131.73:5000'; // Replace with your actual IP
+const API_URL = 'http://192.168.161.73:5000'; // Replace with your actual IP
 
 const UserDetails = () => {
   const [name, setName] = useState('');

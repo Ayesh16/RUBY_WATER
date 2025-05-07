@@ -37,7 +37,14 @@ const UserBookings = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setBookings(response.data);
+      // Sort bookings from latest to oldest
+      const sortedBookings = response.data.sort(
+        (a: any, b: any) =>
+          new Date(b.createdAt || b.delivery_time).getTime() -
+          new Date(a.createdAt || a.delivery_time).getTime()
+      );
+
+      setBookings(sortedBookings);
     } catch (err: any) {
       Alert.alert('Error', err.response?.data?.message || 'Failed to fetch bookings');
     } finally {
@@ -70,6 +77,12 @@ const UserBookings = () => {
           {item.delivery_time
             ? new Date(item.delivery_time).toLocaleString()
             : 'Not set'}
+        </Text>
+        <Text style={styles.detail}>
+          🕒 Booked At:{' '}
+          {item.createdAt
+            ? new Date(item.createdAt).toLocaleString()
+            : 'Unknown'}
         </Text>
 
         {/* Toggle Switch for status */}
@@ -130,7 +143,7 @@ const UserBookings = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 100, // Adjust this to fit *under* the Navbar
+    paddingTop: 100,
     backgroundColor: '#f8f9fa',
   },
   listContent: {
