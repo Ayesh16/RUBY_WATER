@@ -7,12 +7,16 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Navbar from '@/components/Navbar';
+import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 
-const API_URL = 'http://192.168.131.73:5000'; // Change to your IP if testing on device
+const API_URL = 'http://192.168.131.73:5000'; // Replace with your actual IP
 
 const UserDetails = () => {
   const [name, setName] = useState('');
@@ -32,7 +36,6 @@ const UserDetails = () => {
   const fetchUserDetails = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
-      console.log('Token:', token);
       if (!token) return;
 
       const res = await axios.get(`${API_URL}/auth/profile`, {
@@ -40,8 +43,6 @@ const UserDetails = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log('User Data:', res.data);
 
       setName(res.data.name);
       setOriginalName(res.data.name);
@@ -71,8 +72,6 @@ const UserDetails = () => {
         },
       });
 
-      console.log('Update Response:', res.data);
-
       setOriginalName(name);
       setOriginalPhone(phone);
       setOriginalAddress(address);
@@ -89,113 +88,139 @@ const UserDetails = () => {
   }
 
   return (
-    <><Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
-    <View style={styles.container}>
-
-      <Text style={styles.label}>Email:</Text>
-      <Text style={styles.value}>{email}</Text>
-
-      <Text style={styles.label}>Name:</Text>
-      {editing ? (
-        <TextInput style={styles.input} value={name} onChangeText={setName} />
-      ) : (
-        <Text style={styles.value}>{name}</Text>
-      )}
-
-      <Text style={styles.label}>Phone:</Text>
-      {editing ? (
-        <TextInput style={styles.input} value={phone} onChangeText={setPhone} />
-      ) : (
-        <Text style={styles.value}>{phone}</Text>
-      )}
-
-      <Text style={styles.label}>Address:</Text>
-      {editing ? (
-        <TextInput style={styles.input} value={address} onChangeText={setAddress} />
-      ) : (
-        <Text style={styles.value}>{address}</Text>
-      )}
-
-      <TouchableOpacity
-        onPress={editing ? saveChanges : () => setEditing(true)}
-        style={styles.button}
+    <>
+      <Navbar isLoggedIn={true} onLogout={() => console.log("Logging out...")} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={100}
       >
-        <Text style={styles.buttonText}>{editing ? 'Save Changes' : 'Edit Profile'}</Text>
-      </TouchableOpacity>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.container}>
+            <View style={styles.fieldGroup}>
+              <MaterialIcons name="email" size={20} color="#6b7280" />
+              <Text style={styles.label}>Email</Text>
+            </View>
+            <Text style={styles.value}>{email}</Text>
 
-      {editing && (
-        <TouchableOpacity
-          onPress={() => {
-            setName(originalName);
-            setPhone(originalPhone);
-            setAddress(originalAddress);
-            setEditing(false);
-          } }
-          style={[styles.button, styles.cancelButton]}
-        >
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
-      )}
-    </View></>
+            <View style={styles.fieldGroup}>
+              <Ionicons name="person" size={20} color="#6b7280" />
+              <Text style={styles.label}>Name</Text>
+            </View>
+            {editing ? (
+              <TextInput style={styles.input} value={name} onChangeText={setName} />
+            ) : (
+              <Text style={styles.value}>{name}</Text>
+            )}
+
+            <View style={styles.fieldGroup}>
+              <Feather name="phone" size={20} color="#6b7280" />
+              <Text style={styles.label}>Phone</Text>
+            </View>
+            {editing ? (
+              <TextInput style={styles.input} value={phone} onChangeText={setPhone} />
+            ) : (
+              <Text style={styles.value}>{phone}</Text>
+            )}
+
+            <View style={styles.fieldGroup}>
+              <Ionicons name="location-outline" size={20} color="#6b7280" />
+              <Text style={styles.label}>Address</Text>
+            </View>
+            {editing ? (
+              <TextInput style={styles.input} value={address} onChangeText={setAddress} />
+            ) : (
+              <Text style={styles.value}>{address}</Text>
+            )}
+
+            <TouchableOpacity
+              onPress={editing ? saveChanges : () => setEditing(true)}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>{editing ? 'Save Changes' : 'Edit Profile'}</Text>
+            </TouchableOpacity>
+
+            {editing && (
+              <TouchableOpacity
+                onPress={() => {
+                  setName(originalName);
+                  setPhone(originalPhone);
+                  setAddress(originalAddress);
+                  setEditing(false);
+                }}
+                style={[styles.button, styles.cancelButton]}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      padding: 24,
-      marginTop:100,
-      backgroundColor: '#f9fafb',
-      flex: 1,
-    },
-    label: {
-      fontWeight: '600',
-      marginTop: 20,
-      fontSize: 15,
-      color: '#111827',
-      letterSpacing: 0.5,
-    },
-    value: {
-      fontSize: 16,
-      marginTop: 6,
-      color: '#374151',
-      backgroundColor: '#e5e7eb',
-      padding: 10,
-      borderRadius: 8,
-    },
-    input: {
-      borderWidth: 1,
-      borderColor: '#d1d5db',
-      borderRadius: 10,
-      padding: 12,
-      marginTop: 6,
-      fontSize: 16,
-      backgroundColor: '#fff',
-      color: '#111827',
-    },
-    button: {
-      backgroundColor: '#3b82f6',
-      paddingVertical: 14,
-      paddingHorizontal: 20,
-      borderRadius: 10,
-      marginTop: 32,
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 3,
-      elevation: 3,
-    },
-    cancelButton: {
-      backgroundColor: '#9ca3af',
-      marginTop: 12,
-    },
-    buttonText: {
-      color: '#ffffff',
-      fontWeight: 'bold',
-      fontSize: 16,
-      letterSpacing: 0.5,
-    },
-  });
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  container: {
+    padding: 24,
+    paddingTop: 100, // <- Added to push content below sticky navbar
+    backgroundColor: '#f9fafb',
+    flex: 1,
+  },
   
+  fieldGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    gap: 6,
+  },
+  label: {
+    fontWeight: '600',
+    fontSize: 15,
+    color: '#1f2937',
+  },
+  value: {
+    fontSize: 16,
+    marginTop: 8,
+    color: '#111827',
+    backgroundColor: '#e5e7eb',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 8,
+    fontSize: 16,
+    backgroundColor: '#ffffff',
+    color: '#111827',
+  },
+  button: {
+    backgroundColor: '#2563eb',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 32,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#6b7280',
+    marginTop: 12,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: '600',
+    fontSize: 16,
+    letterSpacing: 0.6,
+  },
+});
 
 export default UserDetails;
