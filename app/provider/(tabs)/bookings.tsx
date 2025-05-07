@@ -10,9 +10,10 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, { FadeIn, FadeOut, Layout } from "react-native-reanimated";
+import { Ionicons } from "@expo/vector-icons";
 import Navbar from "@/components/Navbar";
 
-const API_URL = "http://192.168.131.73:5000/bookings"; // Replace with your LAN IP
+const API_URL = "http://192.168.131.73:5000/bookings";
 
 type Booking = {
   _id: string;
@@ -36,6 +37,7 @@ const ProviderBookings: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [showStatusOptions, setShowStatusOptions] = useState<string | null>(null);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -77,7 +79,12 @@ const ProviderBookings: React.FC = () => {
       Alert.alert("Error", "Could not update booking status.");
     } finally {
       setUpdatingId(null);
+      setShowStatusOptions(null);
     }
+  };
+
+  const toggleStatusOptions = (bookingId: string) => {
+    setShowStatusOptions(showStatusOptions === bookingId ? null : bookingId);
   };
 
   useEffect(() => {
@@ -99,10 +106,6 @@ const ProviderBookings: React.FC = () => {
       <ScrollView style={styles.container}>
         <Text style={styles.header}>🚛 All Bookings</Text>
 
-        <TouchableOpacity onPress={fetchBookings} style={styles.refresh}>
-          <Text style={{ color: "#2196F3" }}>🔄 Refresh</Text>
-        </TouchableOpacity>
-
         {bookings.length === 0 ? (
           <Text style={styles.noBookings}>No bookings found</Text>
         ) : (
@@ -114,10 +117,10 @@ const ProviderBookings: React.FC = () => {
               key={booking._id}
               style={styles.card}
             >
-              <Text style={styles.label}>Customer:</Text>
+              <Text style={styles.label}>Customer ID:</Text>
               <Text style={styles.text}>{booking.customer_id || "N/A"}</Text>
 
-              <Text style={styles.label}>Truck:</Text>
+              <Text style={styles.label}>Truck ID:</Text>
               <Text style={styles.text}>{booking.truck_id || "N/A"}</Text>
 
               <Text style={styles.label}>Address:</Text>
@@ -140,38 +143,50 @@ const ProviderBookings: React.FC = () => {
               )}
 
               <Text style={styles.label}>Status:</Text>
-              <Text
-                style={[
-                  styles.status,
-                  { color: STATUS_COLORS[booking.status] || "#333" },
-                ]}
-              >
-                {booking.status}
-              </Text>
+              <View style={styles.statusRow}>
+                <Text
+                  style={[
+                    styles.status,
+                    { color: STATUS_COLORS[booking.status] || "#333" },
+                  ]}
+                >
+                  {booking.status}
+                </Text>
+                <TouchableOpacity
+                  style={styles.statusButton}
+                  onPress={() => toggleStatusOptions(booking._id)}
+                >
+                  <Ionicons name="ellipsis-vertical" size={20} color="#2196F3" />
+                </TouchableOpacity>
+              </View>
 
               <View style={styles.buttonRow}>
-                {Object.keys(STATUS_COLORS).map((status) => (
-                  <TouchableOpacity
-                    key={status}
-                    style={[
-                      styles.statusButton,
-                      {
-                        backgroundColor:
-                          booking.status === status ? "#ccc" : STATUS_COLORS[status],
-                      },
-                    ]}
-                    onPress={() => updateStatus(booking._id, status)}
-                    disabled={
-                      updatingId === booking._id || status === booking.status
-                    }
-                  >
-                    <Text style={styles.statusText}>
-                      {updatingId === booking._id && status !== booking.status
-                        ? "..."
-                        : status.toUpperCase()}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {showStatusOptions === booking._id &&
+                  Object.keys(STATUS_COLORS).map((status) => (
+                    <TouchableOpacity
+                      key={status}
+                      style={[
+                        styles.statusButton,
+                        {
+                          backgroundColor:
+                            booking.status === status ? "#ccc" : STATUS_COLORS[status],
+                        },
+                      ]}
+                      onPress={() => updateStatus(booking._id, status)}
+                      disabled={updatingId === booking._id || status === booking.status}
+                    >
+                      <Text style={styles.statusText}>{status.toUpperCase()}</Text>
+                      {status === "Confirmed" && (
+                        <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                      )}
+                      {status === "Cancelled" && (
+                        <Ionicons name="close-circle" size={20} color="#fff" />
+                      )}
+                      {status === "Delivered" && (
+                        <Ionicons name="checkmark-done-circle" size={20} color="#fff" />
+                      )}
+                    </TouchableOpacity>
+                  ))}
               </View>
             </Animated.View>
           ))
@@ -190,7 +205,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#333",
   },
-  refresh: { alignSelf: "flex-end", marginBottom: 10 },
   noBookings: { textAlign: "center", marginTop: 20, fontSize: 16 },
   card: {
     backgroundColor: "#fff",
@@ -205,10 +219,15 @@ const styles = StyleSheet.create({
   },
   label: { fontWeight: "bold", marginTop: 5 },
   text: { fontSize: 16 },
+  statusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 5,
+  },
   status: {
     fontSize: 16,
     fontWeight: "bold",
-    marginVertical: 5,
   },
   buttonRow: {
     flexDirection: "row",
@@ -221,15 +240,19 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    shadowColor: "#000",
+    shadowColor: "#1010",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   statusText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 12,
+    marginRight: 8,
   },
 });
 
