@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,19 +21,24 @@ const Login: React.FC = () => {
 
   const router = useRouter();
 
-  const storeUserDetails = async (token: string, ownerId: string) => {
+  const storeUserDetails = async (token: string, ownerId: string, role: string) => {
     try {
       await AsyncStorage.setItem("authToken", token);
       await AsyncStorage.setItem("ownerId", ownerId);
-      console.log("✅ Token & Owner ID stored successfully!");
+      await AsyncStorage.setItem("userRole", role);
+      console.log("✅ Token, Owner ID & Role stored successfully!");
     } catch (error) {
-      console.error("❌ Error storing token & owner ID:", error);
+      console.error("❌ Error storing login data:", error);
     }
   };
 
   const handleLogin = async () => {
-    setLoading(true);
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in both fields");
+      return;
+    }
 
+    setLoading(true);
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -47,24 +53,23 @@ const Login: React.FC = () => {
         throw new Error(data.message || "Invalid credentials");
       }
 
-      if (!data.token || !data.owner_id) {
-        throw new Error("⚠️ Token or Owner ID missing in response!");
+      const { token, owner_id, role } = data;
+
+      if (!token || !owner_id || !role) {
+        throw new Error("⚠️ Missing login response data");
       }
 
-      await storeUserDetails(data.token, data.owner_id);
+      await storeUserDetails(token, owner_id, role);
 
-      const storedToken = await AsyncStorage.getItem("authToken");
-      const storedOwnerId = await AsyncStorage.getItem("ownerId");
-      console.log("📌 Stored Token:", storedToken);
-      console.log("📌 Stored Owner ID:", storedOwnerId);
-
-      console.log("📌 User Role:", data.role);
-
-      setTimeout(() => {
-        router.push(data.role === "provider" ? "/provider/providerhome" : "/home");
-      }, 2000);
+      // Navigate based on role
+      if (role === "provider") {
+        router.replace("/provider/providerhome");
+      } else {
+        router.replace("/home");
+      }
     } catch (error: any) {
-      console.error("❌ Login Error:", error.message);
+      console.error("Login Error:", error.message);
+      Alert.alert("Login Failed", error.message);
     } finally {
       setLoading(false);
     }
@@ -72,71 +77,87 @@ const Login: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <MotiView
-        from={{ opacity: 0, translateY: 50 }}
-        animate={{ opacity: 1, translateY: 0 }}
-        transition={{ type: "timing", duration: 800 }}
-      >
+      <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 200 }}>
         <Text style={styles.title}>Login</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        {loading ? (
-          <ActivityIndicator size="large" color="#4CAF50" />
-        ) : (
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-        )}
-
-        <View style={styles.signupLinkContainer}>
-          <Text>New User?</Text>
-          <TouchableOpacity onPress={() => router.push("/auth/signup")}>
-            <Text style={styles.signupLink}> Register</Text>
-          </TouchableOpacity>
-        </View>
       </MotiView>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        autoCapitalize="none"
+        keyboardType="email-address"
+        onChangeText={setEmail}
+        value={email}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        onChangeText={setPassword}
+        value={password}
+      />
+
+      {loading ? (
+        <ActivityIndicator size="large" color="blue" />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      )}
+
+      <View style={styles.signupLinkContainer}>
+        <Text>Don't have an account?</Text>
+        <TouchableOpacity onPress={() => router.push("/auth/signup")}>
+          <Text style={styles.signupLink}> Sign Up</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
+export default Login;
+
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 30,
+    textAlign: "center",
+  },
   input: {
-    height: 50,
-    borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
-    marginBottom: 10,
-    backgroundColor: "#F9F9F9",
+    borderColor: "#ccc",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 16,
+    backgroundColor: "#f9f9f9",
   },
   button: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "blue",
     padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
+    borderRadius: 10,
     marginTop: 10,
   },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  signupLinkContainer: { flexDirection: "row", justifyContent: "center", marginTop: 15 },
-  signupLink: { color: "#007BFF", fontWeight: "bold", textDecorationLine: "underline" },
+  buttonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  signupLinkContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  signupLink: {
+    color: "#007BFF",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+  },
 });
-
-export default Login;
