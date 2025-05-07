@@ -21,8 +21,8 @@ import axios from "axios";
 import * as Animatable from "react-native-animatable";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const API_URL = "http://192.168.131.73:5000/auth/signup";
-const CATEGORY_URL = "http://192.168.131.73:5000/categories";
+const API_URL = "http://192.168.161.73:5000/auth/signup";
+const CATEGORY_URL = "http://192.168.161.73:5000/categories";
 
 const schema = yup.object({
   name: yup.string().required("Customer name is required"),

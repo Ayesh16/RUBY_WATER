@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Navbar from "@/components/Navbar";
 
-const API_URL = "http://192.168.131.73:5000";
+const API_URL = "http://192.168.161.73:5000";
 
 const AddTruck = () => {
   const router = useRouter();
